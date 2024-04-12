@@ -7,7 +7,7 @@ from typing import Generator
 # Environment variables for database connection or hardcoded values
 #DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname")
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://admin:admin@localhost/oneplusdb")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg2://admin:admin@localhost/oneplusdb")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

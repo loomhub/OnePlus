@@ -10,9 +10,10 @@ class Transaction(Base):
     details = Column(String)
     amount = Column(Numeric(10, 2))
     classification = Column(String)
-    asset = Column(String)
+    property_name = Column(String)
     transaction_group = Column(String)
     transaction_type = Column(String)
     vendor = Column(String)
     customer = Column(String)
     comments = Column(String)
+

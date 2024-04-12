@@ -8,7 +8,7 @@ class TransactionDTO(BaseModel):
     details: str
     amount: float
     classification: str
-    asset: str
+    property_name: str
     transaction_group: str
     transaction_type: str
     vendor: str

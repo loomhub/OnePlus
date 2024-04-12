@@ -16,7 +16,7 @@ class TransactionRepository:
               details = transaction.details,
               amount = transaction.amount,
               classification = transaction.classification,
-              asset = transaction.asset,
+              property_name = transaction.property_name,
               transaction_group = transaction.transaction_group,
               transaction_type = transaction.transaction_type,
               vendor = transaction.vendor,

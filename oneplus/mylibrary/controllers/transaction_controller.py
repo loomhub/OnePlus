@@ -18,17 +18,6 @@ router = APIRouter()
 async def root():
     return {"message": "Welcome to Oneplus API!"}
 
-@router.get(
-        "/hello/",
-        summary="Welcome message",
-        description="Welcome message for the Oneplus API.",
-        status_code=200,
-        tags=["Root"],
-        )
-async def root():
-    return {"message": "Welcome to Oneplus API!"}
-
-
 @router.post(
         "/transactions/",
         summary="Add transactions",
@@ -48,7 +37,6 @@ def add_transaction(
         return transaction_service.create_transaction(db=db, transaction=transaction)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-
 
 @router.post("/transactions/upload/")
 def upload_transactions_file(
