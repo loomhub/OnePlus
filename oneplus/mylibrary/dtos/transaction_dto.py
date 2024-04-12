@@ -3,8 +3,24 @@ from datetime import date
 
 
 class TransactionDTO(BaseModel):
-    id: int
-    amount: float
-    transaction_type: str
-    account_id: int
     date: date
+    description: str
+    details: str
+    amount: float
+    classification: str
+    asset: str
+    transaction_group: str
+    transaction_type: str
+    vendor: str
+    customer: str
+    comments: str
+
+class TransactionCreate(TransactionDTO):
+    pass
+
+class TransactionGet(TransactionDTO):
+    id: int
+    created_at: date
+
+    class Config:
+        orm_mode = True
