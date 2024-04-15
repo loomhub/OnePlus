@@ -17,9 +17,8 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-from oneplus.mylibrary.models.transaction_model import Transaction
-target_metadata = Transaction.Base.metadata
-#target_metadata = None
+from oneplus.mylibrary.database.db import Base  # Import the Base class
+target_metadata = Base.metadata  # Set the target metadata to the Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

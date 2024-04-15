@@ -1,0 +1,22 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+###
+# @name post_transaction
+POST {{hostName}}/transactions
+Content-Type: application/json
+
+{
+    "date": "2024-04-02",
+    "description": "Rent",
+    "details": "Apr Rent",
+    "amount": "1100.00",
+    "classification": "Revenue",
+    "property_name": "104Meadow",
+    "transaction_group": "Rev-Rent",
+    "transaction_type": "Debit",
+    "vendor": "Tenant",
+    "customer": "104Meadow",
+    "comments": "Rent for April"
+}

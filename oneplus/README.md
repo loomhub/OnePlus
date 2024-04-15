@@ -1,6 +1,30 @@
 1. Run python3 -m venv venv
 2. Run source venv/bin/activate
-   FLOW OF THE PROGRAM
+
+Alembic
+
+1. Run `alembic init alembic` to create an alembic folder
+2. Edit alembic.ini file to add "sqlalchemy.url=postgresql+psycopg2://admin:admin@localhost/oneplusrealtydb"
+3. Edit alembic/env.py file to add "from oneplus.mylibrary.database.db import Base # Import the Base class"
+4. Edit alembic/env.py file to add "target_metadata = Base.metadata # Set the target metadata to the Base.metadata"
+5. Run `alembic revision --autogenerate -m "Create new database oneplusrealtydb"`
+6. Alembic Revision ID: 112c2833dc69
+
+PostgresSQL using terminal
+
+1. In terminal, type `psql postgres`
+2. Now run `CREATE DATABASE oneplusrealtydb OWNER admin;`
+3. Now run "GRANT ALL PRIVILEGES ON DATABASE oneplusrealtydb TO admin;"
+4. Run "\q" to exit
+
+PostgreSQL Database using pgAdmin:
+Port: The default PostgreSQL port is 5432. Use this unless you've changed it during the PostgreSQL installation or configuration.
+Server: localhost
+Database: oneplusrealtydb
+Username: admin
+Password: admin
+
+FLOW OF THE PROGRAM
 
 A) CONTROLLERS:
 Controllers contain the methods (GET, PUT, POST, DELETE, PATCH, HEAD, OPTIONS ) specifying the type of operation client wants to perform on a resource.
