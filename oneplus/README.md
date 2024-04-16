@@ -1,7 +1,7 @@
 1. Run python3 -m venv venv
 2. Run source venv/bin/activate
 
-Alembic
+Alembic Initial Setupo
 
 1. Run `alembic init alembic` to create an alembic folder
 2. Edit alembic.ini file to add "sqlalchemy.url=postgresql+psycopg2://admin:admin@localhost/oneplusrealtydb"
@@ -10,7 +10,7 @@ Alembic
 5. Run `alembic revision --autogenerate -m "Create new database oneplusrealtydb"`
 6. Alembic Revision ID: 112c2833dc69
 
-PostgresSQL using terminal
+PostgresSQL initial setup using terminal
 
 1. In terminal, type `psql postgres`
 2. Now run `CREATE DATABASE oneplusrealtydb OWNER admin;`
@@ -23,6 +23,14 @@ Server: localhost
 Database: oneplusrealtydb
 Username: admin
 Password: admin
+
+Using Alembic migrations:
+
+1. Make changes to the model
+2. Execute `alembic revision --autogenerate -m "Describe the change"
+3. Modify the revision to align with model change.
+4. Execute `alembic upgrade head`
+5. Validate changes in pgAdmin
 
 FLOW OF THE PROGRAM
 

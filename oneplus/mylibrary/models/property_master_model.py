@@ -8,7 +8,7 @@ class PropertyMaster(Base):
     id = Column(Integer, primary_key=True, index=True)
     property_name = Column(String,primary_key=True, index=True)
     property_description = Column(String)
-    LLC = Column(String) 
+    llc = Column(String) 
     note = Column(String,CheckConstraint('note IN ("LLC","VJ","NG","PG")'))
     account_type = Column(String,CheckConstraint('account_type IN ("Checking","Savings")'))
     bank_name = Column(String)
