@@ -3,7 +3,7 @@ from ..database.db import Base
 from sqlalchemy.orm import relationship
 
 class LLCMaster(Base):
-    __tablename__ = "llc_master"
+    __tablename__ = "llcs"
 
     id = Column(Integer, primary_key=True, index=True)
     llc = Column(String, index=True, nullable=False,unique = True)
