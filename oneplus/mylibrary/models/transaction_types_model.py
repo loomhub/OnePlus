@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint,UniqueConstraint
 from ..database.db import Base
 from sqlalchemy.orm import relationship
-class LLCMaster(Base):
+class TransactionTypes(Base):
     __tablename__ = "transaction_types"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, U
 from ..database.db import Base
 from sqlalchemy.orm import relationship
 
-class LLCMaster(Base):
+class Llcs(Base):
     __tablename__ = "llcs"
 
     id = Column(Integer, primary_key=True, index=True)
