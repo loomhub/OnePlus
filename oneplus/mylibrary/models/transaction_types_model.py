@@ -5,8 +5,8 @@ class LLCMaster(Base):
     __tablename__ = "transaction_types"
 
     id = Column(Integer, primary_key=True, index=True)
-    transaction_group = Column(String, index=True)
-    transaction_type = Column(String, index=True)
+    transaction_group = Column(String, index=True, nullable=False)
+    transaction_type = Column(String, index=True, nullable=False)
     transaction_description = Column(String)
     # Define the composite unique constraint
     __table_args__ = (
