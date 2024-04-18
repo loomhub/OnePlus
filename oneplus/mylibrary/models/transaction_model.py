@@ -12,7 +12,7 @@ class Transactions(Base):
     details = Column(String,nullable=False, index=True)
     amount = Column(Numeric(10, 2),nullable=False,index=True)
     classification = Column(String)
-    property_name = Column(String,foreign_key='property_master.property_name')
+    property_name = Column(String,ForeignKey('property_master.property_name'))
     transaction_group = Column(String,ForeignKey('transaction_types.transaction_group'))
     transaction_type = Column(String,ForeignKey('transaction_types.transaction_type'))
     vendor = Column(String)
