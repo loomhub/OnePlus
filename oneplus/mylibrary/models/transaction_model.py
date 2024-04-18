@@ -25,4 +25,4 @@ class Transactions(Base):
     # easier to access the associated objects from both sides.
     property_rel = relationship("PropertyMaster", back_populates="transactions")
 
-PropertyMaster.transactions = relationship("Transaction", order_by=Transaction.date, back_populates="property_rel")   
+PropertyMaster.transactions = relationship("Transactions", order_by=Transactions.date, back_populates="property_rel")   
