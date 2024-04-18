@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint,ForeignKey
 from ..database.db import Base
 from sqlalchemy.orm import relationship
 from property_master_model import PropertyMaster
@@ -19,8 +19,8 @@ class BusinessRulesLogic(Base):
     key4 = Column(String,nullable=False,index=True)
     op4 = Column(String,nullable=False,index=True)
     val4 = Column(String,nullable=False,index=True)
-    transaction_group = Column(String)
-    transaction_type = Column(String)
+    transaction_group = Column(String,ForeignKey('transaction_types.transaction_group'))
+    transaction_type = Column(String,ForeignKey('transaction_types.transaction_type'))
     vendor = Column(String)
     customer = Column(String)
     vendor_w9 = Column(String)

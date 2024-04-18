@@ -9,6 +9,7 @@ class Llcs(Base):
     llc = Column(String, index=True, nullable=False,unique = True)
     ein = Column(String)
     llc_address = Column(String) 
+    properties = relationship("PropertyMaster", back_populates="llc_entity")
     __table_args__ = (
         UniqueConstraint('llc', name='uix_llc'),
     )
