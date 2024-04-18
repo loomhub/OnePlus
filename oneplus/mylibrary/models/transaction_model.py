@@ -18,6 +18,8 @@ class Transactions(Base):
     vendor = Column(String)
     customer = Column(String)
     comments = Column(String)
+    vendor_w9 = Column(String)
+    customer_w9 = Column(String)
     __table_args__ = (
         UniqueConstraint('date', 'description','details' ,'amount', name='uix_transaction'),
     )
