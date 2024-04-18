@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint,ForeignKey
 from ..database.db import Base
 from sqlalchemy.orm import relationship
 from property_master_model import PropertyMaster
@@ -13,8 +13,8 @@ class Transactions(Base):
     amount = Column(Numeric(10, 2),nullable=False,index=True)
     classification = Column(String)
     property_name = Column(String,foreign_key='property_master.property_name')
-    transaction_group = Column(String)
-    transaction_type = Column(String)
+    transaction_group = Column(String,ForeignKey('transaction_types.transaction_group'))
+    transaction_type = Column(String,ForeignKey('transaction_types.transaction_type'))
     vendor = Column(String)
     customer = Column(String)
     comments = Column(String)
