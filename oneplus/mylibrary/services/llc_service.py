@@ -20,13 +20,17 @@ class llcService:
                 # LLC exists, update it
                 llc_instance.ein = llc_data.ein
                 llc_instance.llc_address = llc_data.llc_address
+                llc_instance.llc_description = llc_data.llc_description
+                llc_instance.formation_date = llc_data.formation_date
                 created = False
             else:
                 # Create new LLC
                 llc_instance = Llcs(
                     llc=llc_data.llc,
                     ein=llc_data.ein,
-                    llc_address=llc_data.llc_address
+                    llc_address=llc_data.llc_address,
+                    llc_description=llc_data.llc_description,
+                    formation_date=llc_data.formstion_date
                 )
                 llc_instance = await self.llc_repository.add_llc(llc_instance)
                 created = True

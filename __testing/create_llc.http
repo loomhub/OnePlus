@@ -10,7 +10,10 @@ Content-Type: application/json
 {
     "llc": "MID",
     "ein": "87-1462989",
-    "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034"
+    "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034",
+    "llc_description": "MIDWAY INN LLC",
+    "formation_date": "2021-06-29"
+
 }
 ###
 # @name get_transaction
