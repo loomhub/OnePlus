@@ -1,0 +1,70 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+############################################################################################
+# @name post_transaction
+POST {{hostName}}/llc
+Content-Type: application/json
+        {
+            "llc": "MID",
+            "ein": "87-1462989",
+            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034",
+            "llc_description": "MIDWAY INN LLC",
+            "formation_date": "2021-06-29"
+        }
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/llcs
+Content-Type: application/json
+
+
+{
+    "llcs": [
+        {
+            "llc": "MID",
+            "ein": "87-1462989 NEW",
+            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034 NEW",
+            "llc_description": "MIDWAY INN LLC NEW",
+            "formation_date": "2021-06-29"
+        },
+        {
+            "llc": "TST",
+            "ein": "87-1462999 NEW",
+            "llc_address": "8700 TEST PKWY UNIT 2758 FRISCO, TX 75034 NEW",
+            "llc_description": "TEST INN LLC NEW",
+            "formation_date": "2022-06-29"
+        },
+        {
+            "llc": "YYY",
+            "ein": "87-1462999 XXX",
+            "llc_address": "XXX TEST PKWY UNIT 2758 FRISCO, TX 75034 NEW",
+            "llc_description": "XXXTEST INN LLC NEW",
+            "formation_date": "2019-06-29"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_llcs
+DELETE {{hostName}}/llcsdel
+Content-Type: application/json
+
+
+{
+    "llcs": [
+        {
+            "llc": "MID"
+        },
+        {
+            "llc": "TST"
+        }
+    ]
+}
+############################################################################################
+
+# @name get_transaction
+GET {{hostName}}/llcs
+Content-Type: application/json
+

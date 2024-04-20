@@ -12,15 +12,35 @@ class LLCRepository:
             stmt = select(Llcs).where(Llcs.llc == llc_name)
             result = await session.execute(stmt)
             return result.scalars().first()
+        
+    async def get_llc_instances(self):
+        async with self.db_session as session:
+            stmt = select(Llcs)
+            result = await session.execute(stmt)
+            return result.scalars().all()
 
     async def add_llc(self, llc_instance: Llcs):
+        try:
+            self.db_session.add(llc_instance)
+            await self.db_session.commit()
+            return llc_instance
+        except Exception as e:
+            await self.db_session.rollback()
+            raise e
+    
+    async def delete_llc(self, llc_instance: Llcs):
         async with self.db_session as session:
-            session.add(llc_instance)
+            await session.delete(llc_instance)
             await session.commit()
             return llc_instance
 
     async def commit_changes(self):
-        await self.db_session.commit()
+        try:
+            await self.db_session.commit()
+        except Exception as e:
+            await self.db_session.rollback()
+            raise e
+        #await self.db_session.commit()
 
     async def rollback_changes(self):
         await self.db_session.rollback()
