@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint,ForeignKey
 from ..database.db import Base
 from sqlalchemy.orm import relationship
+#from ..models.llc_model import Llcs
 
 class PropertyMaster(Base):
     __tablename__ = "property_master"
@@ -13,8 +14,7 @@ class PropertyMaster(Base):
     account_type = Column(String,CheckConstraint('account_type IN ("Checking","Savings")'))
     bank_name = Column(String)
     account_number = Column(Numeric(10, 0))
-    llc_entity = relationship("Llcs", back_populates="properties")
     __table_args__ = (
         UniqueConstraint('property_name', name='uix_property_name'),
     )
-    
+    llc_entity = relationship("Llcs")

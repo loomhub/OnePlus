@@ -1,0 +1,19 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+###
+# @name post_transaction
+POST {{hostName}}/llcs
+Content-Type: application/json
+
+{
+    "llc": "MID",
+    "ein": "87-1462989",
+    "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034"
+}
+###
+# @name get_transaction
+GET {{hostName}}/
+Content-Type: application/json
+
