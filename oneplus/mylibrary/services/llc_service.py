@@ -1,3 +1,5 @@
+from datetime import date
+from typing import Optional
 from pydantic import BaseModel
 import logging
 from ..repositories.llc_repository import LLCRepository
@@ -9,14 +11,33 @@ class llcService:
         self.llc_repository = llc_repository
 
 ############################################################################################################
-    async def get_all_llcs(self) -> llcsListDTO:
+    async def extract_llcs(self) -> llcsListDTO:
         """
         CGet LLC entities 
         :param 
         :return: list of llcs
         """
         try:
-            return await self.llc_repository.get_llc_instances()
+            return await self.llc_repository.retrieve_llcs()
+
+        except Exception as e:
+            # Handle specific database errors or re-raise
+            await self.llc_repository.rollback_changes()
+            raise Exception(f"Database error: {str(e)}")
+    
+############################################################################################################
+    async def extract_llcs_by_name_and_date(
+            self,
+            llc_name:Optional[str] = None,
+            start_date:Optional[date] = None) -> llcsListDTO:
+        """
+        CGet LLC entities 
+        :param llc_name: Name of the LLC to filter by
+        :param start_date: Query LLCs created on or after this date
+        :return: list of llcs
+        """
+        try:
+            return await self.llc_repository.retrieve_llcs_by_name_and_date(llc_name, start_date)
 
         except Exception as e:
             # Handle specific database errors or re-raise
@@ -31,7 +52,7 @@ class llcService:
         :return: Tuple containing boolean (True if created, False if updated) and llc instance
         """
         try:
-            llc_instance = await self.llc_repository.get_llc_by_name(llc_data.llc)
+            llc_instance = await self.llc_repository.retrieve_llc_by_name(llc_data.llc)
 
             if llc_instance:
                 llc_instance = await self.llc_repository.delete_llc(llc_instance)
@@ -62,7 +83,7 @@ class llcService:
         :return: Tuple containing boolean (True if deleted, False if not deleted) and llc instance
         """
         try:
-            llc_instance = await self.llc_repository.get_llc_by_name(llc_data.llc)
+            llc_instance = await self.llc_repository.retrieve_llc_by_name(llc_data.llc)
 
             if llc_instance:
                 # LLC exists, delete it

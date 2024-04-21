@@ -1,3 +1,5 @@
+from datetime import date
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -7,15 +9,25 @@ class LLCRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def get_llc_by_name(self, llc_name: str):
+    async def retrieve_llcs(self):
+        async with self.db_session as session:
+            stmt = select(Llcs)
+            result = await session.execute(stmt)
+            return result.scalars().all()
+        
+    async def retrieve_llc_by_name(self, llc_name: str):
         async with self.db_session as session:
             stmt = select(Llcs).where(Llcs.llc == llc_name)
             result = await session.execute(stmt)
             return result.scalars().first()
-        
-    async def get_llc_instances(self):
+    
+    async def retrieve_llcs_by_name_and_date(self, llc_name: Optional[str] = None, start_date: Optional[date] = None):
         async with self.db_session as session:
             stmt = select(Llcs)
+            if llc_name:
+                stmt = stmt.where(Llcs.llc == llc_name)
+            if start_date:
+                stmt = stmt.where(Llcs.formation_date >= start_date)
             result = await session.execute(stmt)
             return result.scalars().all()
 

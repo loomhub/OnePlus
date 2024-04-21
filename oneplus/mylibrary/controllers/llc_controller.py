@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.llc_dto import llcDTO, llcsListDTO, llcsDelListDTO, llcsListFullDTO
+from ..dtos.llc_dto import LLCQueryParams, llcDTO, llcsListDTO, llcsDelListDTO, llcsListFullDTO
 from ..database.db import get_session
 from ..repositories.llc_repository import LLCRepository
 from ..services.llc_service import llcService
@@ -27,7 +27,7 @@ async def root():
         summary="Get LLCs",
         description="Get all LLCs from database",
         status_code=200,
-        response_model=llcsListFullDTO,
+        response_model=llcsListDTO,
         tags=["Get"],
         )
 
@@ -35,7 +35,29 @@ async def get_llcs(db: AsyncSession = Depends(get_session)):
     llc_repository = LLCRepository(db)
     llc_service = llcService(llc_repository)
     try:
-        results = await llc_service.get_all_llcs()
+        results = await llc_service.extract_llcs()
+    except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    return {"llcs":results}
+
+############################################################################################################
+@router.get(
+        "/search/llcs",
+        summary="Get LLCs by name and start date",
+        description="Get LLCs from database by name and start date",
+        status_code=200,
+        response_model=llcsListDTO,
+        tags=["Get"],
+        )
+
+async def get_llcs_by_name_and_date(
+    query_params: LLCQueryParams = Depends(),
+    db: AsyncSession = Depends(get_session)
+    ):
+    llc_repository = LLCRepository(db)
+    llc_service = llcService(llc_repository)
+    try:
+        results = await llc_service.extract_llcs_by_name_and_date(query_params.llc_name, query_params.start_date)
     except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return {"llcs":results}
