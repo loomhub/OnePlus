@@ -34,3 +34,11 @@ class llcsDelListDTO(BaseModel):
 class LLCQueryParams(BaseModel):
     llc_name: Optional[str] = Field(None, description="Name of the LLC to filter by")
     start_date: Optional[date] = Field(None, description="Query LLCs created on or after this date")
+
+LLC_COLUMNS = {
+    'LLC': 'llc',
+    'EIN': 'ein',
+    'Address': 'llc_address',
+    'Description': 'llc_description',
+    'FormationDate': 'formation_date'
+}    

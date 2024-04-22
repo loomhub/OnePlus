@@ -58,6 +58,16 @@ Content-Type: application/json
 }
 
 ############################################################################################
+# @name post_transactions
+POST {{hostName}}/upload_llcs
+accept: application/json
+Content-Type: multipart/form-data
+
+{
+    "file":"@llc_master.csv;type=text/csv"
+}
+
+############################################################################################
 # @name delete_llcs
 DELETE {{hostName}}/llcsdel
 Content-Type: application/json
