@@ -14,18 +14,6 @@ Content-Type: application/json
     
     
 ############################################################################################
-# @name post_transaction
-POST {{hostName}}/llc
-Content-Type: application/json
-        {
-            "llc": "MID",
-            "ein": "87-1462989",
-            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034",
-            "llc_description": "MIDWAY INN LLC",
-            "formation_date": "2021-06-29"
-        }
-
-############################################################################################
 # @name post_transactions
 POST {{hostName}}/llcs
 Content-Type: application/json
@@ -34,37 +22,27 @@ Content-Type: application/json
 {
     "llcs": [
         {
-            "llc": "MID",
-            "ein": "87-1462989 NEW",
-            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034 NEW",
-            "llc_description": "MIDWAY INN LLC NEW",
+            "llc": "VIV",
+            "ein": "87-1462989 CHIV",
+            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034 CHIV",
+            "llc_description": "MIDWAY INN LLC CHIV",
             "formation_date": "2021-06-29"
         },
         {
-            "llc": "TST",
-            "ein": "87-1462999 NEW",
-            "llc_address": "8700 TEST PKWY UNIT 2758 FRISCO, TX 75034 NEW",
-            "llc_description": "TEST INN LLC NEW",
+            "llc": "GOL",
+            "ein": "87-1462999 VIV",
+            "llc_address": "8700 TEST PKWY UNIT 2758 FRISCO, TX 75034 VIV",
+            "llc_description": "TEST INN LLC VIV",
             "formation_date": "2022-06-29"
         },
         {
             "llc": "YYY",
-            "ein": "87-1462999 XXX",
-            "llc_address": "XXX TEST PKWY UNIT 2758 FRISCO, TX 75034 NEW",
-            "llc_description": "XXXTEST INN LLC NEW",
+            "ein": "87-1462999 PPP",
+            "llc_address": "XXX TEST PKWY UNIT 2758 FRISCO, TX 75034 PPP",
+            "llc_description": "XXXTEST INN LLC PPP",
             "formation_date": "2019-06-29"
         }
     ]
-}
-
-############################################################################################
-# @name post_transactions
-POST {{hostName}}/upload_llcs
-accept: application/json
-Content-Type: multipart/form-data
-
-{
-    "file":"@llc_master.csv;type=text/csv"
 }
 
 ############################################################################################
@@ -76,10 +54,10 @@ Content-Type: application/json
 {
     "llcs": [
         {
-            "llc": "XXX"
+            "llc": "MID"
         },
         {
-            "llc": "TST"
+            "llc": "MDW"
         }
     ]
 }

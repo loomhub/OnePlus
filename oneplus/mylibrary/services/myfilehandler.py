@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from ..dtos.llc_dto import LLC_COLUMNS, llcsListDTO, llcDTO
 
 
-class FileHandler:
+class myFileHandler:
     def __init__(self, file):
         if file.content_type != 'text/csv':
             raise HTTPException(status_code=400, detail="Invalid file type. Please upload a CSV file.")

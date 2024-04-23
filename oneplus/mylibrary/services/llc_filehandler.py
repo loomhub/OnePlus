@@ -1,8 +1,8 @@
 from fastapi import HTTPException
-from .filehandler import FileHandler
+from .myfilehandler import myFileHandler
 from ..dtos.llc_dto import LLC_COLUMNS, llcDTO, llcsListDTO
 
-class llcFileHandler(FileHandler):
+class llcFileHandler(myFileHandler):
     def __init__(self, file):
         super().__init__(file)
         
