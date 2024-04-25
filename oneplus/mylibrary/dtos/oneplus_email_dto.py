@@ -8,7 +8,7 @@ class birdDTO(BaseModel):
     class Config:
         orm_mode = True
 
-class oneplus_mail_DTO(BaseModel):
+class oneplusMailDTO(BaseModel):
     subject : str
     receiver : str
     cc : str
@@ -24,3 +24,6 @@ class birdsDelListDTO(BaseModel):
 
 class birdListDTO(BaseModel):
     birds: List[birdDTO]
+
+class oneplusMailListDTO(BaseModel):
+    oneplusMails: List[oneplusMailDTO]

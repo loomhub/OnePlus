@@ -1,6 +1,9 @@
-from typing import Tuple, Type
+from typing import Tuple, Type, TypeVar
 from pydantic import BaseModel
 from ..repositories.myrepository import myRepository  # Assuming a base repository exists
+# Define a type variable that can be any subclass of BaseModel
+DTO = TypeVar('DTO', bound=BaseModel)
+
 
 class MyService:
     def __init__(self, repository: myRepository):
@@ -16,7 +19,7 @@ class MyService:
             raise Exception(f"Database error: {str(e)}")
 
     ############################################################################################################
-    async def upsert_records(self, data_dto, model: Type[BaseModel], key_fields: dict) -> Tuple[bool, BaseModel]:
+    async def upsert_records(self, data_dto:DTO, model: Type[BaseModel], key_fields: dict) -> Tuple[bool, BaseModel]:
         """
         Upsert an entity based on the provided data.
         :param data_dto: Data transfer object containing entity details
@@ -44,7 +47,7 @@ class MyService:
             await self.repository.rollback_changes()
             raise Exception(f"Database error: {str(e)}")
 ############################################################################################################
-    async def delete_records(self, data_dto, model: Type[BaseModel], key_fields: dict) -> Tuple[bool, BaseModel]:
+    async def delete_records(self, data_dto:DTO, model: Type[BaseModel], key_fields: dict) -> Tuple[bool, BaseModel]:
            """
            Delete an entity based on the provided data.
             :param data_dto: Data transfer object containing entity details
@@ -64,7 +67,7 @@ class MyService:
                 deleted = False
 
             await self.repository.commit_changes()
-            return deleted
+            return deleted,entity_instance
 
            except Exception as e:
                # Handle specific database errors or re-raise

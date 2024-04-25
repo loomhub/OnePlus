@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Type
+from typing import List, Optional, Type
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -8,7 +8,7 @@ class myRepository:
     def __init__(self, db_session: AsyncSession):
         self.db_session = db_session
 
-    async def retrieve_all(self,data_model: Type[BaseModel]): #The model class to be used for the query
+    async def retrieve_all(self,data_model: Type[BaseModel]) -> List[BaseModel]:
         try:
             async with self.db_session as session:
                 stmt = select(data_model)
@@ -17,11 +17,11 @@ class myRepository:
         except Exception as e:
             raise e
         
-    async def retrieve_unique_record(self, model: Type[BaseModel], filters: dict):
+    async def retrieve_unique_record(self, model: Type[BaseModel], filters: dict) -> Optional[BaseModel]:
         """
-        Retrieve a unique record by multiple field filters.
-        :param model: SQLAlchemy model class
-        :param filters: Dictionary of field names and values to filter by
+       # Retrieve a unique record by multiple field filters.
+       # :param model: SQLAlchemy model class
+       # :param filters: Dictionary of field names and values to filter by
         """
         try:
             async with self.db_session as session:
@@ -33,7 +33,7 @@ class myRepository:
         except Exception as e:
             raise e
             
-    async def add_data(self, data_model: Type[BaseModel]):
+    async def add_data(self, data_model: Type[BaseModel])-> BaseModel:
         try:
             self.db_session.add(data_model)
             await self.db_session.commit()
@@ -42,7 +42,7 @@ class myRepository:
             await self.db_session.rollback()
             raise e
     
-    async def delete_data(self, data_model: Type[BaseModel]):
+    async def delete_data(self, data_model: Type[BaseModel]) -> bool:
         try:    
             async with self.db_session as session:
                 await session.delete(data_model)
@@ -52,12 +52,12 @@ class myRepository:
             await self.db_session.rollback()
             raise e
 
-    async def commit_changes(self):
+    async def commit_changes(self) -> None:
         try:
             await self.db_session.commit()
         except Exception as e:
             await self.db_session.rollback()
             raise e
 
-    async def rollback_changes(self):
+    async def rollback_changes(self) -> None:
         await self.db_session.rollback()

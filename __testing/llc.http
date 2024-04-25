@@ -22,7 +22,7 @@ Content-Type: application/json
 {
     "llcs": [
         {
-            "llc": "VIV",
+            "llc": "DHI",
             "ein": "87-1462989 CHIV",
             "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034 CHIV",
             "llc_description": "MIDWAY INN LLC CHIV",
@@ -54,7 +54,7 @@ Content-Type: application/json
 {
     "llcs": [
         {
-            "llc": "MID"
+            "llc": "PAG"
         },
         {
             "llc": "MDW"

@@ -9,6 +9,14 @@ from ..services.llc_filehandler import llcFileHandler
 from ..models.llc_model import Llcs
 import logging
 
+# DEFINITIONS
+get_all=post_all="/llcs"
+del_all = "/llcsdel"
+excel_upload = "/llcsxl"
+myObjects="llcs"
+get_response_model=llcsListDTO
+del_response_model=llcsDelListDTO
+myModel=Llcs
 
 router = APIRouter()
 
@@ -25,22 +33,22 @@ async def root():
 
 ############################################################################################################
 @router.get(
-        "/llcs",
-        summary="Get LLCs",
-        description="Get all LLCs from database",
+        get_all,
+        summary="Get all records",
+        description="Get all records from database",
         status_code=200,
-        response_model=llcsListDTO,
+        response_model=get_response_model,
         tags=["Get"],
         )
 
-async def get_llcs(db: AsyncSession = Depends(get_session)):
-    llc_repository = LLCRepository(db)
-    llc_service = llcService(llc_repository)
+async def get_all_records(db: AsyncSession = Depends(get_session)):
+    my_repository = LLCRepository(db)
+    my_service = llcService(my_repository)
     try:
-        results = await llc_service.extract_all(Llcs)
+        results = await my_service.extract_all(myModel)
     except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    return {"llcs":results}
+    return {myObjects:results}
 
 ############################################################################################################
 @router.get(
@@ -48,7 +56,7 @@ async def get_llcs(db: AsyncSession = Depends(get_session)):
         summary="Get LLCs by name and start date",
         description="Get LLCs from database by name and start date",
         status_code=200,
-        response_model=llcsListDTO,
+        response_model=get_response_model,
         tags=["Get"],
         )
 
@@ -56,76 +64,75 @@ async def get_llcs_by_name_and_date(
     query_params: LLCQueryParams = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    llc_repository = LLCRepository(db)
-    llc_service = llcService(llc_repository)
+    my_repository = LLCRepository(db)
+    my_service = llcService(my_repository)
     try:
-        results = await llc_service.extract_llcs_by_name_and_date(query_params.llc_name, query_params.start_date)
+        results = await my_service.extract_llcs_by_name_and_date(query_params.llc_name, query_params.start_date)
     except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
-    return {"llcs":results}
+    return {myObjects:results}
 
 ############################################################################################################
 @router.post(
-        "/llcs",
-        summary="Create or edit multiple LLCs",
-        description="Create or edit multiple LLCs",
+        post_all,
+        summary="Create or edit multiple records",
+        description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_llc(llcs_data: llcsListDTO, db: AsyncSession = Depends(get_session)):
-    llc_repository = LLCRepository(db)
-    llc_service = llcService(llc_repository)
+async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+    my_repository = LLCRepository(db)
+    my_service = llcService(my_repository)
     results = []
-    for llc in llcs_data.llcs:
+    for record in input_data.llcs:
         try:
-            key_fields = {'llc': llc.llc}  # Adjust according to actual key fields
-            created, result = await llc_service.upsert_records(llc, Llcs, key_fields)
-            results.append( {"created": created, "llc": result} )
+            key_fields = {'llc': record.llc}  # Adjust according to actual key fields
+            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            results.append( {"created": created, myObjects: result} )
         except Exception as e:
-            logging.error(f"Failed to update or create LLC: {str(e)}")
+            logging.error(f"Failed to update or create record: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e))
     return results
 ############################################################################################################
 
-@router.post("/llcsxl", summary="Upload and save LLCs data from a CSV file")
-async def upload_and_save_llc_file(
+@router.post(excel_upload, summary="Upload and save LLCs data from a CSV file")
+async def upload_and_upsert_records(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    llc_filehandler = llcFileHandler(file)
-    llcs_data = llc_filehandler.extract_data_from_file()
+    my_filehandler = llcFileHandler(file)
+    input_data = my_filehandler.extract_data_from_file()
 
-    llc_repository = LLCRepository(db)
-    llc_service = llcService(llc_repository)
+    my_repository = LLCRepository(db)
+    my_service = llcService(my_repository)
     results = []
-    for llc in llcs_data.llcs:
+    for record in input_data.llcs:
         try:
-            key_fields = {'llc': llc.llc}  # Adjust according to actual key fields
-            created, result = await llc_service.upsert_records(llc, Llcs, key_fields)
-            results.append( {"created": created, "llc": result} )
+            key_fields = {'llc': record.llc}  # Adjust according to actual key fields
+            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            results.append( {"created": created, myObjects: result} )
         except Exception as e:
-            logging.error(f"Failed to update or create LLC: {str(e)}")
+            logging.error(f"Failed to update or create record: {str(e)}")
             raise HTTPException(status_code=400, detail=str(e))
     return results
     
 ############################################################################################################
 
 @router.delete(
-        "/llcsdel",
-        summary="Delete multiple LLCs",
-        description="Delete multiple LLCs",
+        del_all,
+        summary="Delete multiple record",
+        description="Delete multiple records",
         tags=["Delete"],
         )
-async def delete_llc(llcs_data: llcsDelListDTO, db: AsyncSession = Depends(get_session)):
-    llc_repository = LLCRepository(db)
-    llc_service = llcService(llc_repository)
+async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
+    my_repository = LLCRepository(db)
+    my_service = llcService(my_repository)
     results = []
-    for llc in llcs_data.llcs:
+    for record in input_data.llcs:
         try:
-            #deleted, result = await llc_service.delete_llc(llc)
-            key_fields = {'llc': llc.llc}  # Adjust according to actual key fields
-            deleted = await llc_service.delete_records(llc, Llcs, key_fields)
-            results.append( {"deleted": deleted} )
+            key_fields = {'llc': record.llc}  # Adjust according to actual key fields
+            deleted,result = await my_service.delete_records(record, myModel, key_fields)
+            results.append( {"deleted": deleted,myObjects: result} )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return results
