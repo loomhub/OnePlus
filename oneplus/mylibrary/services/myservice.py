@@ -1,5 +1,6 @@
-from typing import Tuple, Type, TypeVar
+from typing import Optional, Tuple, Type, TypeVar
 from pydantic import BaseModel
+from sqlalchemy.exc import SQLAlchemyError
 from ..repositories.myrepository import myRepository  # Assuming a base repository exists
 # Define a type variable that can be any subclass of BaseModel
 DTO = TypeVar('DTO', bound=BaseModel)
@@ -11,7 +12,7 @@ class MyService:
 
     ############################################################################################################    
 
-    async def extract_all(self, model: Type[BaseModel]) -> list:
+    async def extract_all(self, model: Type[BaseModel]) -> Optional[list]:
         try:
             return await self.repository.retrieve_all(model)
         except Exception as e:
@@ -19,6 +20,21 @@ class MyService:
             raise Exception(f"Database error: {str(e)}")
 
     ############################################################################################################
+    async def extract_pkey(self,model: Type[BaseModel],pkey: dict) -> Optional[BaseModel]:
+        try:
+            result = await self.repository.retrieve_unique_record(model, pkey)
+            if result is None:
+                print("Record not found")
+            return result
+        except SQLAlchemyError as e:  # Handling more specific database errors
+            await self.repository.rollback_changes()
+            raise Exception(f"Database error: {str(e)}")
+        # except Exception as e:  # General exception if needed, though specific ones are preferred
+        #     await self.repository.rollback_changes()
+        #     raise Exception(f"Unexpected error: {str(e)}")
+
+    ############################################################################################################
+
     async def upsert_records(self, data_dto:DTO, model: Type[BaseModel], key_fields: dict) -> Tuple[bool, BaseModel]:
         """
         Upsert an entity based on the provided data.

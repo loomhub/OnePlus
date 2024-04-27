@@ -1,8 +1,8 @@
 from sqlalchemy import Column, Integer, String,Date, UniqueConstraint
 from ..database.db import Base
 
-class llcsModel(Base):
-    __tablename__ = "llcs"
+class samplesModel(Base):
+    __tablename__ = "samples"
 
     id = Column(Integer, primary_key=True, index=True)
     llc = Column(String, index=True, nullable=False,unique = True)

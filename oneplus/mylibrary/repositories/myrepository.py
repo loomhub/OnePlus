@@ -3,6 +3,7 @@ from typing import List, Optional, Type
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.exc import SQLAlchemyError
 
 class myRepository:
     def __init__(self, db_session: AsyncSession):
@@ -30,8 +31,15 @@ class myRepository:
                     stmt = stmt.where(getattr(model, field) == value)
                 result = await session.execute(stmt)
                 return result.scalars().first()
+        except SQLAlchemyError as e:
+        # Handle specific database query errors
+            await session.rollback()
+            print(f"Database error during record retrieval: {e}")
+            return None
         except Exception as e:
-            raise e
+        # Handle any other exceptions that may not be related to the database
+            print(f"An error occurred: {e}")
+            return None
             
     async def add_data(self, data_model: Type[BaseModel])-> BaseModel:
         try:

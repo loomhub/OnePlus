@@ -8,11 +8,14 @@ Content-Type: application/json
 
 ############################################################################################
 # @name get_transaction
-GET {{hostName}}/search/llcs?llc_name=YYY&start_date=1990-12-31
-#GET {{hostName}}/search/llcs?start_date=1990-12-31
+GET {{hostName}}/search/llcs?llc_name=Y&start_date=1990-12-31
 Content-Type: application/json
-    
-    
+
+############################################################################################
+GET {{hostName}}/llcs/pkey?llc_name=MI
+Content-Type: application/json    
+
+
 ############################################################################################
 # @name post_transactions
 POST {{hostName}}/llcs
@@ -52,12 +55,15 @@ Content-Type: application/json
 
 
 {
-    "llcs": [
+    "llcsDel": [
         {
-            "llc": "PAG"
+            "llc": "DHI"
         },
         {
-            "llc": "MDW"
+            "llc": "GOL"
+        },
+        {
+            "llc": "YYY"
         }
     ]
 }

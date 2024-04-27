@@ -1,0 +1,55 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/birds
+Content-Type: application/json
+
+
+############################################################################################
+GET {{hostName}}/birds/pkey?sender=guppydove@gmail.com
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/birds
+Content-Type: application/json
+
+
+{
+    "birds": [
+        {
+            "sender": "dummy",
+            "pwd": "87-1462989 CHIV"
+        },
+        {
+            "sender": "GOL",
+            "pwd": "87-1462999 VIV"
+       },
+        {
+            "sender": "YYY",
+            "pwd": "87-1462999 PPP"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_llcs
+DELETE {{hostName}}/birdsdel
+Content-Type: application/json
+
+
+{
+    "birdsDel": [
+        {
+            "sender": "YYY"
+        },
+        {
+            "llc": "GOL"
+        }
+    ]
+}
+############################################################################################
+
