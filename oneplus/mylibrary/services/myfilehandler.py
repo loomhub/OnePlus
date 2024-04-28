@@ -58,4 +58,17 @@ class myFileHandler:
                     print(f"Error converting {column_name}: {e}")
             else:
                 print(f"Column {column_name} not found in DataFrame.")
-            return df
+        return df
+    
+    def convert_columns_to_string(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str]) -> pd.DataFrame:
+        for column_name in column_names:
+            if column_name in df.columns:
+                try:
+                    df[column_name] = df[column_name].fillna('').astype(str)
+                except Exception as e:
+                    print(f"Error converting {column_name}: {e}")
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        return df

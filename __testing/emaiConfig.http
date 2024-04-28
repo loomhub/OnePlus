@@ -1,0 +1,56 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/emailsConfig
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/emailsConfig?subject=Y&endpoint=Z
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/emailsConfig/pkey?subject=LLC report
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/emailsConfig
+Content-Type: application/json
+
+
+{
+    "emailsConfig": [
+        {
+            "subject": "LLC report",
+            "endpoint": "/llcs",
+            "to": "vivekjadhav@yahoo.com",
+            "inactive": ""
+        },
+        {
+            "subject": "Test report",
+            "endpoint": "/llcs",
+            "to": "",
+            "inactive": "X"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_emailsConfig
+DELETE {{hostName}}/emailsConfigdel
+Content-Type: application/json
+
+
+{
+    "emailsConfigDel": [
+        {
+            "subject": "Test report"
+        }
+    ]
+}
+############################################################################################
+

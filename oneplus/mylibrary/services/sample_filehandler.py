@@ -13,6 +13,6 @@ class sampleFileHandler(myFileHandler):
         df=self.convert_columns_to_date(df, ['formation_date'])
         try:
             samples_data = self.convert_dataframe_to_list_dto(df,sampleDTO)
-            return samplesListDTO(llcs=samples_data)
+            return samplesListDTO(samples=samples_data)
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")
