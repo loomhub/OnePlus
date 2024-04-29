@@ -18,18 +18,22 @@ class myRepository:
         except Exception as e:
             raise e
         
-    async def retrieve_unique_record(self, model: Type[BaseModel], filters: dict) -> Optional[BaseModel]:
+    async def retrieve_unique_record(self, model: Type[BaseModel], filters: dict,**kwargs) -> Optional[BaseModel]:
         """
        # Retrieve a unique record by multiple field filters.
        # :param model: SQLAlchemy model class
        # :param filters: Dictionary of field names and values to filter by
         """
+        multiple = kwargs.get('multiple', None) 
+
         try:
             async with self.db_session as session:
                 stmt = select(model)
                 for field, value in filters.items():
                     stmt = stmt.where(getattr(model, field) == value)
                 result = await session.execute(stmt)
+                if multiple:
+                    return result.scalars().all()
                 return result.scalars().first()
         except SQLAlchemyError as e:
         # Handle specific database query errors

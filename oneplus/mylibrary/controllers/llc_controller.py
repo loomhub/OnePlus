@@ -48,6 +48,8 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
     my_service = llcService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
+        sent = await my_service.send_email(results,get_all)
+        print(sent)
     except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return {myObjects:results}

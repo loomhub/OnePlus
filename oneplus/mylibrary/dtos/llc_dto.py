@@ -11,6 +11,9 @@ class llcDTO(BaseModel):
     class Config:
         orm_mode = True  
 
+class llcsListDTO(BaseModel):
+    llcs: List[llcDTO]
+
 class llcFullDTO(BaseModel):
     id : int
     llc : str
@@ -27,8 +30,7 @@ class llcsFullListDTO(BaseModel):
 class llcDelDTO(BaseModel):
     llc : str
 
-class llcsListDTO(BaseModel):
-    llcs: List[llcDTO]
+
 
 class llcsDelListDTO(BaseModel):
     llcsDel: List[llcDelDTO]

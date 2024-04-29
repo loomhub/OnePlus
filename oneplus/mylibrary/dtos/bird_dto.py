@@ -5,6 +5,9 @@ from pydantic import BaseModel, Field
 class birdDTO(BaseModel):
     sender : Optional[str] = None
     pwd : Optional[str] = None
+    active : Optional[str] = None
+    server : Optional[str] = None
+    port : Optional[int] = None
     class Config:
         orm_mode = True
 

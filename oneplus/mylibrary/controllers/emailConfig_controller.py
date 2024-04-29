@@ -102,7 +102,7 @@ async def upload_and_upsert_records(
     results = []
     for record in input_data.emailsConfig:
         try:
-            key_fields = {'subject': record.subject}  # Adjust according to actual key fields
+            key_fields = {'subject': record.subject,'to': record.to,'cc': record.cc,'bcc': record.bcc}  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
