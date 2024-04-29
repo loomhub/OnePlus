@@ -2,6 +2,7 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from io import BytesIO
 import smtplib
 from typing import Optional, Tuple, Type, TypeVar
 import pandas as pd
@@ -137,7 +138,7 @@ class MyService:
         except Exception as e:
             raise Exception(f"Email creation error: {str(e)}")
 ############################################################################################################
-    def create_excel_file(self, data:list[BaseModel],subject:str) -> str:
+    def create_excel_file(self, data:list[BaseModel]) -> BytesIO:
         """
         Creates Excel file.
         :param data: List of data to be sent
@@ -152,14 +153,29 @@ class MyService:
                 dict_list.append(item_dict)
             # Create a DataFrame
             df = pd.DataFrame(dict_list)
-            filePath = f"{subject}.xlsx"
-            # Create Excel file
-            df.to_excel(filePath, index=False)
-            return filePath
+            # Create a BytesIO buffer
+            output = BytesIO()
+            
+            # Write DataFrame to the buffer as an Excel file
+            with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                df.to_excel(writer, index=False)
+               # writer.save()
+            
+            # Rewind the buffer
+            output.seek(0)
+        
+            return output
+
+            # filePath = f"{subject}.xlsx"
+            # if not filePath.endswith('.xlsx'):
+            #     filePath += '.xlsx'
+            # # Create Excel file
+            # df.to_excel(filePath, index=False)
+            # return filePath
         except Exception as e:
             raise Exception(f"Excel file creation error: {str(e)}")
 ############################################################################################################
-    def attach_file(self, msg, filePath:str) -> str:
+    def attach_file(self, msg, inMemoryExcel) -> str:
         """
         Attaches file to email.
         :param msg: Email message
@@ -167,11 +183,12 @@ class MyService:
         :return: Email message
         """
         try:
-            attachment = open(filePath, "rb")
+            #attachment = open(filePath, "rb")
             part = MIMEBase('application', 'octet-stream')
-            part.set_payload(attachment.read())
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', f'attachment; filename= {filePath}')
+            part.set_payload(inMemoryExcel.read())
+            encoders.encode_base64(part)    
+            subject=f"{msg['Subject']}.xlsx"
+            part.add_header('Content-Disposition', 'attachment', filename=subject)
             msg.attach(part)
             return msg
         except Exception as e:
@@ -193,8 +210,8 @@ class MyService:
             msg = MIMEMultipart()
             print(type(msg))
             msg = self.set_email_addresses(msg,emailsConfig,bird)
-            filePath = self.create_excel_file(data,msg['Subject'])
-            msg=self.attach_file(msg,filePath)
+            inMemoryExcel = self.create_excel_file(data)
+            msg=self.attach_file(msg,inMemoryExcel)
             # Send email
             server = smtplib.SMTP(bird.server, bird.port)
             server.starttls()
