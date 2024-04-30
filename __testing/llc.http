@@ -3,9 +3,13 @@
 @var1=value1 
 
 # @name get_transaction
-GET {{hostName}}/llcs
+GET {{hostName}}/llcs/email?receiver=vivekjadhava@yahoo.com
 Content-Type: application/json
 
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/llcs
+Content-Type: application/json
 ############################################################################################
 # @name get_transaction
 GET {{hostName}}/search/llcs?llc_name=Y&start_date=1990-12-31

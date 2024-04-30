@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.llc_dto import LLCQueryParams,LLCQueryPrimaryKey,llcsListDTO, llcsDelListDTO, llcDTO
+from ..dtos.llc_dto import LLCQueryEmail, LLCQueryParams,LLCQueryPrimaryKey,llcsListDTO, llcsDelListDTO, llcDTO
 from ..database.db import get_session
 from ..repositories.llc_repository import LLCRepository
 from ..services.llc_service import llcService
@@ -11,6 +11,7 @@ import logging
 
 # DEFINITIONS
 get_all=post_all="/llcs"
+send_llc_report="/llcs/email"
 get_pkey="/llcs/pkey"
 del_all = "/llcsdel"
 excel_upload = "/llcsxl"
@@ -48,13 +49,38 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
     my_service = llcService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
-        sent = await my_service.send_email(results,get_all)
-        print(sent)
     except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return {myObjects:results}
 
 ############################################################################################################
+@router.get(
+        send_llc_report,
+        summary="Send LLC report to email",
+        description="Send LLC report to email",
+        status_code=200,
+        response_model=get_response_model,
+        tags=["Get"],
+        )
+
+async def send_llc_report(
+     query_params: LLCQueryEmail = Depends(),
+     db: AsyncSession = Depends(get_session)
+     ):
+    my_repository = LLCRepository(db)
+    my_service = llcService(my_repository)
+    try:
+        results = await my_service.extract_all(myModel)
+        sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
+        if sent == False:
+            results = []
+
+    except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    return {myObjects:results}
+
+############################################################################################################
+
 @router.get(
         get_pkey,
         summary="Get record by primary key",

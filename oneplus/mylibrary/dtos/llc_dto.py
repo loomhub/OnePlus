@@ -30,8 +30,6 @@ class llcsFullListDTO(BaseModel):
 class llcDelDTO(BaseModel):
     llc : str
 
-
-
 class llcsDelListDTO(BaseModel):
     llcsDel: List[llcDelDTO]
 
@@ -41,6 +39,9 @@ class LLCQueryParams(BaseModel):
 
 class LLCQueryPrimaryKey(BaseModel):
     llc_name: str = Field(None, description="Name of the LLC to filter by")
+
+class LLCQueryEmail(BaseModel):
+    receiver: Optional[str] = Field(None, description="Name of the email receiver")
 
 LLC_COLUMNS = {
     'LLC': 'llc',
