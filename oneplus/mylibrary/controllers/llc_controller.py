@@ -6,7 +6,7 @@ from ..database.db import get_session
 from ..repositories.llc_repository import LLCRepository
 from ..services.llc_service import llcService
 from ..services.llc_filehandler import llcFileHandler
-from ..models.llc_model import llcsModel
+from ..models.llcs_model import llcsModel
 import logging
 
 # DEFINITIONS

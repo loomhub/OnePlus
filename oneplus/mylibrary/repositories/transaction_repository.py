@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from ..models.transaction_model import Transaction
+from ..models.transactions_model import Transaction
 from ..dtos.transaction_dto import TransactionCreate
 
 

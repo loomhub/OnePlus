@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
 
 from ..models.emailConfig_model import emailsConfigModel
-from ..models.bird_model import birdsModel
+from ..models.birds_model import birdsModel
 from ..repositories.myrepository import myRepository  # Assuming a base repository exists
 # Define a type variable that can be any subclass of BaseModel
 DTO = TypeVar('DTO', bound=BaseModel)

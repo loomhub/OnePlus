@@ -3,7 +3,7 @@
 @var1=value1 
 
 # @name get_transaction
-GET {{hostName}}/llcs/email?receiver=vivekjadhava@yahoo.com
+GET {{hostName}}/llcs/email?receiver=vivekjadhav@yahoo.com
 Content-Type: application/json
 
 ############################################################################################
@@ -16,7 +16,7 @@ GET {{hostName}}/search/llcs?llc_name=Y&start_date=1990-12-31
 Content-Type: application/json
 
 ############################################################################################
-GET {{hostName}}/llcs/pkey?llc_name=MI
+GET {{hostName}}/llcs/pkey?llc_name=MID
 Content-Type: application/json    
 
 

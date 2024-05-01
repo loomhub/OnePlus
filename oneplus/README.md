@@ -32,6 +32,18 @@ Using Alembic migrations:
 4. Execute `alembic upgrade head`
 5. Validate changes in pgAdmin
 
+Creating a new database table, model, dto, repository, service, filehandler, and controller
+
+1. Use pgAdmin SQL script to create table
+2. Create model by copying from mylibrary/models/sample_model.py
+3. Create dto by copying from mylibrary/dtos/sample_dto.py
+4. Create repository by copying from mylibrary/repositories/sample_repository.py
+5. Create service by copying from mylibrary/services/sample_service.py
+6. Create filehandler by copying from mylibrary/services/sample_filehandler.py
+7. Create controller by copying from mylibrary/controllers/sample_controller.py
+8. Create test file by copying from _testing_/llc.http
+9. Modify main.py to include router
+
 FLOW OF THE PROGRAM
 
 A) CONTROLLERS:

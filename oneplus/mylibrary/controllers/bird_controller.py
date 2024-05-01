@@ -5,7 +5,7 @@ from ..dtos.bird_dto import birdQueryPrimaryKey,birdsListDTO, birdsDelListDTO, b
 from ..database.db import get_session
 from ..repositories.bird_repository import birdRepository
 from ..services.bird_service import birdService
-from ..models.bird_model import birdsModel
+from ..models.birds_model import birdsModel
 import logging
 
 # DEFINITIONS

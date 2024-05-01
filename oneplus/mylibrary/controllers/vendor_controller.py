@@ -6,7 +6,7 @@ from ..database.db import get_session
 from ..repositories.vendor_repository import vendorRepository
 from ..services.vendor_service import vendorService
 from ..services.vendor_filehandler import vendorFileHandler
-from ..models.vendor_model import vendorsModel
+from ..models.vendors_model import vendorsModel
 import logging
 
 # DEFINITIONS

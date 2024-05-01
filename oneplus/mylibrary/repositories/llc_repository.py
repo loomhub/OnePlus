@@ -2,7 +2,7 @@ from datetime import date
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from ..models.llc_model import llcsModel as myModel
+from ..models.llcs_model import llcsModel as myModel
 from .myrepository import myRepository
 
 class LLCRepository(myRepository):

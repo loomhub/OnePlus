@@ -16,7 +16,7 @@ GET {{hostName}}/search/vendors?vendor=Y&start_date=1990-12-31
 Content-Type: application/json
 
 ############################################################################################
-GET {{hostName}}/vendors/pkey?vendor=W9-AAA_SERVICE
+GET {{hostName}}/vendors/pkey?vendor=W9-CCC_SERVICES
 Content-Type: application/json    
 
 

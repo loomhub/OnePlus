@@ -6,7 +6,7 @@ from ..database.db import get_session
 from ..repositories.customer_repository import customerRepository
 from ..services.customer_service import customerService
 from ..services.customer_filehandler import customerFileHandler
-from ..models.customer_model import customersModel
+from ..models.customers_model import customersModel
 import logging
 
 # DEFINITIONS

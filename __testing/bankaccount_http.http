@@ -1,0 +1,79 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/bankaccounts/email?receiver=vivekjadhav@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/bankaccounts
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/bankaccounts?bankaccount_name=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/bankaccounts/pkey?bankaccount_name=MID
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/bankaccounts
+Content-Type: application/json
+
+
+{
+    "bankaccounts": [
+        {
+            "bank": "Wells Fargo",
+            "account_type": "Checking",
+            "account_number": "1160333314",
+            "llc": "MDW"
+        },
+        {
+            "bank": "Wells Fargo",
+            "account_type": "Checking",
+            "account_number": "2123710218",
+            "llc": "MDW",
+            "property_name": "104Meadow"
+        },
+        {
+            "bank": "Chase",
+            "account_type": "Checking",
+            "account_number": "Dummy",
+            "llc": "PAG"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_bankaccounts
+DELETE {{hostName}}/bankaccountsdel
+Content-Type: application/json
+
+
+{
+    "bankaccountsDel": [
+        {
+            "bank": "Chase",
+            "account_type": "Checking",
+            "account_number": "Dummy"
+        },
+        {
+            "bank": "Vivek",
+            "account_type": "Checking",
+            "account_number": "Dummy"
+        },
+        {
+            "bank": "Jadhav",
+            "account_type": "Checking",
+            "account_number": "Dummy"
+        }
+    ]
+}
+############################################################################################
+
