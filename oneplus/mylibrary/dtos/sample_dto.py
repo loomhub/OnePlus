@@ -15,14 +15,14 @@ class sampleFullDTO(BaseModel):
     class Config:
         orm_mode = True
 
+class samplesListDTO(BaseModel):
+    samples: List[sampleDTO]
+
 class samplesFullListDTO(BaseModel):
     samples: List[sampleFullDTO]
 
 class sampleDelDTO(BaseModel):
-    llc : Optional[str] = None
-
-class samplesListDTO(BaseModel):
-    samples: List[sampleDTO]
+    sample : Optional[str] = None
 
 class samplesDelListDTO(BaseModel):
     samplesDel: List[sampleDelDTO]
@@ -31,7 +31,11 @@ class sampleQueryParams(BaseModel):
     sample: Optional[str] = Field(None, description="Name of the sample to filter by")
     
 class sampleQueryPrimaryKey(BaseModel):
-    sample: Optional[str] = Field(None, description="Name of the LLC to filter by")
+    sample: Optional[str] = Field(None, description="Name of the sample to filter by")
+
+class sampleQueryEmail(BaseModel):
+    receiver: Optional[str] = Field(None, description="Name of the email receiver")
+
 
 SAMPLE_COLUMNS = {
     'LLC': 'llc',

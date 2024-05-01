@@ -1,25 +1,25 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.sample_dto import sampleQueryEmail, sampleQueryPrimaryKey,samplesListDTO, samplesDelListDTO, sampleDTO
+from ..dtos.vendor_dto import vendorQueryEmail, vendorQueryPrimaryKey,vendorsListDTO, vendorsDelListDTO, vendorDTO
 from ..database.db import get_session
-from ..repositories.sample_repository import sampleRepository
-from ..services.sample_service import sampleService
-from ..services.sample_filehandler import sampleFileHandler
-from ..models.sample_model import samplesModel
+from ..repositories.vendor_repository import vendorRepository
+from ..services.vendor_service import vendorService
+from ..services.vendor_filehandler import vendorFileHandler
+from ..models.vendor_model import vendorsModel
 import logging
 
 # DEFINITIONS
-get_pkey="/samples/pkey"
-get_all=post_all="/samples"
-send_sample_report="/samples/email"
-del_all = "/samplesdel"
-excel_upload = "/samplesxl"
-myObjects="samples"
-get_response_model=samplesListDTO
-get_pkey_model = sampleDTO
-del_response_model=samplesDelListDTO
-myModel=samplesModel
+get_pkey="/vendors/pkey"
+get_all=post_all="/vendors"
+send_vendor_report="/vendors/email"
+del_all = "/vendorsdel"
+excel_upload = "/vendorsxl"
+myObjects="vendors"
+get_response_model=vendorsListDTO
+get_pkey_model = vendorDTO
+del_response_model=vendorsDelListDTO
+myModel=vendorsModel
 
 router = APIRouter()
 
@@ -34,8 +34,8 @@ router = APIRouter()
         )
 
 async def get_all_records(db: AsyncSession = Depends(get_session)):
-    my_repository = sampleRepository(db)
-    my_service = sampleService(my_repository)
+    my_repository = vendorRepository(db)
+    my_service = vendorService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
     except Exception as e:
@@ -44,20 +44,20 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
 
 ############################################################################################################
 @router.get(
-        send_sample_report,
-        summary="Send sample report to email",
-        description="Send sample report to email",
+        send_vendor_report,
+        summary="Send vendor report to email",
+        description="Send vendor report to email",
         status_code=200,
         response_model=get_response_model,
         tags=["Get"],
         )
 
-async def send_sample_report(
-     query_params: sampleQueryEmail = Depends(),
+async def send_vendor_report(
+     query_params: vendorQueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = sampleRepository(db)
-    my_service = sampleService(my_repository)
+    my_repository = vendorRepository(db)
+    my_service = vendorService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
         sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
@@ -78,13 +78,13 @@ async def send_sample_report(
         )
 
 async def get_record_by_pkey(
-    query_params: sampleQueryPrimaryKey = Depends(),
+    query_params: vendorQueryPrimaryKey = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = sampleRepository(db)
-    my_service = sampleService(my_repository)
+    my_repository = vendorRepository(db)
+    my_service = vendorService(my_repository)
     try:
-        key_fields = {'primary': query_params.primary}  # Adjust according to actual key fields
+        key_fields = {'vendor': query_params.vendor}  # Adjust according to actual key fields
         result = await my_service.extract_pkey(myModel,key_fields)
         if result is None:
             return {}
@@ -100,12 +100,12 @@ async def get_record_by_pkey(
         tags=["Upsert"],
         )
 async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = sampleRepository(db)
-    my_service = sampleService(my_repository)
+    my_repository = vendorRepository(db)
+    my_service = vendorService(my_repository)
     results = []
-    for record in input_data.samples:
+    for record in input_data.vendors:
         try:
-            key_fields = {'primary': record.primary}  # Adjust according to actual key fields
+            key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
@@ -114,21 +114,21 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
     return results
 ############################################################################################################
 
-@router.post(excel_upload, summary="Upload and save samples data from a CSV file")
+@router.post(excel_upload, summary="Upload and save vendors data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    my_filehandler = sampleFileHandler(file)
+    my_filehandler = vendorFileHandler(file)
     input_data = my_filehandler.extract_data_from_file()
 
-    my_repository = sampleRepository(db)
-    my_service = sampleService(my_repository)
+    my_repository = vendorRepository(db)
+    my_service = vendorService(my_repository)
     results = []
-    for record in input_data.samples:
+    for record in input_data.vendors:
         try:
-            key_fields = {'primary': record.primary}  # Adjust according to actual key fields
+            key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
@@ -145,12 +145,12 @@ async def upload_and_upsert_records(
         tags=["Delete"],
         )
 async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = sampleRepository(db)
-    my_service = sampleService(my_repository)
+    my_repository = vendorRepository(db)
+    my_service = vendorService(my_repository)
     results = []
-    for record in input_data.samplesDel:   
+    for record in input_data.vendorsDel:   
         try:
-            key_fields = {'primary': record.primary}  # Adjust according to actual key fields
+            key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
             deleted,result = await my_service.delete_records(record, myModel, key_fields)
             results.append( {"deleted": deleted,myObjects: result} )
         except Exception as e:

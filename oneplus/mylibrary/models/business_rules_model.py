@@ -3,7 +3,7 @@ from ..database.db import Base
 from sqlalchemy.orm import relationship
 from property_master_model import PropertyMaster
 
-class BusinessRulesLogic(Base):
+class businessRulesModel(Base):
     __tablename__ = "business_rules_logic"
 
     id = Column(Integer, primary_key=True, index=True)

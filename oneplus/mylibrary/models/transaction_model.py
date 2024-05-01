@@ -3,7 +3,7 @@ from ..database.db import Base
 from sqlalchemy.orm import relationship
 from property_master_model import PropertyMaster
 
-class Transactions(Base):
+class transactionsModel(Base):
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)

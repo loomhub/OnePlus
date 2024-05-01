@@ -258,8 +258,12 @@ class MyService:
         receiver = kwargs.get('receiver', None) 
         try:
             bird = await self.repository.retrieve_unique_record(birdsModel, {"active": "X"}) #Get sender email
+            if bird == None:
+                return False
             active_endpoint = {"endpoint": endpoint, "inactive": ""}
             emailsConfig = await self.repository.retrieve_unique_record(emailsConfigModel,active_endpoint,multiple="X") #Get email config
+            if emailsConfig == []:
+                return False
             msg = MIMEMultipart()
             if receiver:
                 msg = self.set_receiver(msg,emailsConfig,bird,receiver)

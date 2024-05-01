@@ -1,0 +1,93 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/customers/email?receiver=vivekjadhav@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/customers
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/customers?customer=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/customers/pkey?customer=W9-CUST_1
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/customers
+Content-Type: application/json
+
+
+{
+    "customers": [
+        {
+            "customer" : "W9-CUST_1",
+            "recipient_type" : "Business",
+            "recipient_tin_type" : "EIN",
+            "recipient_tin" : "99-39343433",
+            "last_name" : "AAA SERVICES",
+            "first_name" : "AAA SERVICES",
+            "address" : "8798 SouthBall Dr ",
+            "city" : "Tijuana",
+            "state" : "TX",
+            "zip_code" : "75098",
+            "country" : "USA"
+        },
+        {
+            "customer" : "W9-CUST_2",
+            "recipient_type" : "Individual",
+            "recipient_tin_type" : "SSN",
+            "recipient_tin" : "99-7676739",
+            "last_name" : "AAA SERVICES",
+            "first_name" : "AAA SERVICES",
+            "address" : "8798 SouthBall Dr ",
+            "city" : "Tijuana",
+            "state" : "TX",
+            "zip_code" : "75098",
+            "country" : "USA"
+        },
+        {
+            "customer" : "W9-CUST3",
+            "recipient_type" : "Individual",
+            "recipient_tin_type" : "EIN",
+            "recipient_tin" : "99-394332",
+            "last_name" : "AAA Csutomer",
+            "first_name" : "AAA Customer",
+            "address" : "8798 SouthHorse Dr ",
+            "city" : "Tijuana",
+            "state" : "TX",
+            "zip_code" : "75098",
+            "country" : "USA"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_customers
+DELETE {{hostName}}/customersdel
+Content-Type: application/json
+
+
+{
+    "customersDel": [
+        {
+            "customer": "W9-CUST3"
+        },
+        {
+            "customer": "W9-BBB_SERVICES"
+        },
+        {
+            "customer": "W9-AAA_SERVIC"
+        }
+    ]
+}
+############################################################################################
+

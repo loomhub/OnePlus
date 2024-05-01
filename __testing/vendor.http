@@ -1,0 +1,93 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/vendors/email?receiver=vivekjadhav@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/vendors
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/vendors?vendor=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/vendors/pkey?vendor=W9-AAA_SERVICE
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/vendors
+Content-Type: application/json
+
+
+{
+    "vendors": [
+        {
+            "vendor" : "W9-AAA_SERVICES",
+            "recipient_type" : "Business",
+            "recipient_tin_type" : "EIN",
+            "recipient_tin" : "99-3999953",
+            "last_name" : "AAA SERVICES",
+            "first_name" : "AAA SERVICES",
+            "address" : "8798 SouthBall Dr ",
+            "city" : "Tijuana",
+            "state" : "TX",
+            "zip_code" : "75098",
+            "country" : "USA"
+        },
+        {
+            "vendor" : "W9-BBB_SERVICES",
+            "recipient_type" : "Business",
+            "recipient_tin_type" : "EIN",
+            "recipient_tin" : "99-3999953",
+            "last_name" : "AAA SERVICES",
+            "first_name" : "AAA SERVICES",
+            "address" : "8798 SouthBall Dr ",
+            "city" : "Tijuana",
+            "state" : "TX",
+            "zip_code" : "75098",
+            "country" : "USA"
+        },
+        {
+            "vendor" : "W9-CCC_SERVICES",
+            "recipient_type" : "Business",
+            "recipient_tin_type" : "EIN",
+            "recipient_tin" : "99-3999953",
+            "last_name" : "AAA SERVICES",
+            "first_name" : "AAA SERVICES",
+            "address" : "8798 SouthBall Dr ",
+            "city" : "Tijuana",
+            "state" : "TX",
+            "zip_code" : "75098",
+            "country" : "USA"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_vendors
+DELETE {{hostName}}/vendorsdel
+Content-Type: application/json
+
+
+{
+    "vendorsDel": [
+        {
+            "vendor": "W9-AAA_SERVICES"
+        },
+        {
+            "vendor": "W9-BBB_SERVICES"
+        },
+        {
+            "vendor": "W9-AAA_SERVIC"
+        }
+    ]
+}
+############################################################################################
+

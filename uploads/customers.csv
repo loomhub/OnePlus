@@ -1,0 +1,3 @@
+﻿Customer,Recipient Type,Recipient TIN Type,Recipent TIN,R Business Name or Last Name,R First Name,R Address 1,R City,R State,R Zip Code,R Country
+W9-DUMMY1,Individual,EIN,999-99-9999,DUMMY,Dummy 1,Dummy address,Dummy,TX,99880,USA
+W9-DUMMY2,Individual,EIN,889-87-9098,DUMMY,Dummy 2,Dummy address,Dummy,TX,99880,USA

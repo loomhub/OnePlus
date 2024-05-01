@@ -11,7 +11,6 @@ class llcFileHandler(myFileHandler):
         df = self.read_data()
         df.rename(columns=LLC_COLUMNS, inplace=True)
         df=self.convert_columns_to_date(df, ['formation_date'])
-        #df['formation_date'] = pd.to_datetime(df['formation_date']).dt.date  # Convert to date format
         try:
             llcs_data = self.convert_dataframe_to_list_dto(df,llcDTO)
             return llcsListDTO(llcs=llcs_data)

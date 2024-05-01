@@ -1,0 +1,23 @@
+﻿Transaction Group,Transaction Type
+A01 - Revenue,Rev-Interest
+A01 - Revenue,Rev-Rent
+A02 - Expense,Exp-Allocation
+A02 - Expense,Exp-Cleaning
+A02 - Expense,Exp-HOA
+A02 - Expense,Exp-Insurance
+A02 - Expense,Exp-Mgmt
+A02 - Expense,Exp-Mortgage
+A02 - Expense,Exp-Professional Services
+A02 - Expense,Exp-Repair
+A02 - Expense,Exp-Travel
+A02 - Expense,Exp-Taxes
+A02 - Expense,Exp-Utilities
+A03 - Capex,Capex-Acquisition
+A03 - Capex,Capex-Install
+A03 - Capex,Capex-Mgmt
+A05 - Bank Transfer,Transfer-Checking
+A05 - Bank Transfer,Transfer-Savings
+A06 - Funding,Owner-Funding
+A07 - Security Deposit,Liab-Security
+A08 - Owners Draw,Owners-Draw
+A09 - Owners Withdrawal,Owners-Withdrawal

@@ -1,0 +1,72 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/transactionTypes/email?receiver=vivekjadhava@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/transactionTypes
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/transactionTypes?transactionType_name=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/transactionTypes/pkey?transaction_group=A01-Revenue&transaction_type=Rev-Interest
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/transactionTypes
+Content-Type: application/json
+
+
+{
+    "transactionTypes": [
+        {
+            "transaction_group": "A01-Revenue",
+            "transaction_type": "Rev-Interest",
+            "transaction_description" : "Interest Revenue"
+        },
+        {
+            "transaction_group": "A01-Revenue",
+            "transaction_type": "Rev-Rent",
+            "transaction_description": "Rental Revenue"
+        },
+        {
+            "transaction_group": "A02-Expense",
+            "transaction_type": "Exp-Repair",
+            "transaction_description": "Repair Expense"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_transactionTypes
+DELETE {{hostName}}/transactionTypesdel
+Content-Type: application/json
+
+
+{
+    "transactionTypesDel": [
+        {
+            "transaction_group": "A01-Revenue",
+            "transaction_type": "Rev-Interest"
+        },
+        {
+            "transaction_group": "A01-Revenue",
+            "transaction_type": "Exp-Repair"
+        },
+        {
+            "transaction_group": "DHI",
+            "transaction_type": "DHI"
+        }
+    ]
+}
+############################################################################################
+

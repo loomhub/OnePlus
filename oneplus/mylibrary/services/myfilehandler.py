@@ -1,3 +1,4 @@
+from datetime import datetime
 import os, shutil
 from typing import List, Type
 from fastapi import HTTPException
@@ -39,9 +40,20 @@ class myFileHandler:
     
         dto_list = []
         for index, row in df.iterrows():
+            try:
         # Use dictionary unpacking to initialize the DTO from a row.
-            dto_instance = dto_class(**row.to_dict())
-            dto_list.append(dto_instance)
+                dto_instance = dto_class(**row.to_dict())
+                dto_list.append(dto_instance)
+            except:
+                print(f"Error occurred at row index {index}")
+                for column, value in row.items():
+                    try:
+                        # Attempt to pass each column's value to a dummy function of the class that mimics the constructor's behavior
+                        test_instance = dto_class(**{column: value})
+                    except TypeError:
+                        # Identify and print the problematic column and its value
+                        print(f"Column causing issue: {column}, Value: {value}, Expected type: int")
+                        break  # Break out of the inner loop after finding the first problematic column
 
         print(type(dto_list))   
     
@@ -49,11 +61,15 @@ class myFileHandler:
 
     def convert_columns_to_date(self, 
                         df: pd.DataFrame, 
-                        column_names: List[str]) -> pd.DataFrame:
+                        column_names: List[str],
+                        **kwargs) -> pd.DataFrame:
+        null_value_date = kwargs.get('null_value_date', '2099-12-31')
         for column_name in column_names:
             if column_name in df.columns:
                 try:
+                    df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
                     df[column_name] = pd.to_datetime(df[column_name]).dt.date
+                    
                 except Exception as e:
                     print(f"Error converting {column_name}: {e}")
             else:
@@ -67,6 +83,35 @@ class myFileHandler:
             if column_name in df.columns:
                 try:
                     df[column_name] = df[column_name].fillna('').astype(str)
+                except Exception as e:
+                    print(f"Error converting {column_name}: {e}")
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        return df
+    
+    def convert_columns_to_numeric(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str]) -> pd.DataFrame:
+        for column_name in column_names:
+            if column_name in df.columns:
+                try:
+                    df[column_name] = df[column_name].fillna(0).astype(str)
+                    df[column_name] = df[column_name].str.replace(',', '').str.replace('$', '').str.replace('(', '-').str.replace(')', '')
+                    #df[column_name] = df[column_name].str.replace(r'\((\d+)\)', r'-\1', regex=True).astype(float)
+                    df[column_name] = pd.to_numeric(df[column_name], errors='coerce')   
+                except Exception as e:
+                    print(f"Error converting {column_name}: {e}")
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        return df
+    
+    def convert_columns_to_int(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str]) -> pd.DataFrame:
+        for column_name in column_names:
+            if column_name in df.columns:
+                try:
+                    df[column_name] = df[column_name].astype(int)
                 except Exception as e:
                     print(f"Error converting {column_name}: {e}")
             else:

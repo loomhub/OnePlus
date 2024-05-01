@@ -1,0 +1,84 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/propertyMasters/email?receiver=vivekjadhava@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/propertyMasters
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/propertyMasters?propertyMaster_name=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/propertyMasters/pkey?property_name=104Meadow
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/propertyMasters
+Content-Type: application/json
+
+
+{
+    "propertyMasters": [
+        {
+            "property_name": "104Meadow",
+            "property_description": "104 Meadowview Lane Anna TX 75409",
+            "llc": "MDW",
+            "note": "VJ",
+            "purchase_date": "2013-08-15",
+            "purchase_price": 145000,
+            "units": 1,
+            "county": "Collin"
+    },
+        {
+            "property_name": "108Meadow",
+            "property_description": "108 Meadowview Lane Anna TX 75409",
+            "llc": "MDW",
+            "note": "PG",
+            "purchase_date": "2014-03-15",
+            "purchase_price": 145000,
+            "units": 1,
+            "county": "Collin"
+    },
+        {
+            "property_name": "108Pagoda",
+            "property_description": "108 Pagoda Drive Anna TX 75409",
+            "llc": "PAG",
+            "note": "NG",
+            "purchase_date": "2013-08-20",
+            "purchase_price": 143000,
+            "units": 1,
+            "county": "Collin"
+    }
+    ]
+}
+
+############################################################################################
+# @name delete_propertyMasters
+DELETE {{hostName}}/propertyMastersdel
+Content-Type: application/json
+
+
+{
+    "propertyMastersDel": [
+        {
+            "property_name": "104Meadow" 
+        },
+        {
+            "property_name": "10Meadow" 
+        },
+        {
+            "property_name": "108Meadow" 
+        }
+    ]
+}
+############################################################################################
+
