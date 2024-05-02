@@ -1,25 +1,25 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.transaction_type_dto import transactionTypeQueryEmail, transactionTypeQueryPrimaryKey, transactionTypeQueryUpdateFlag,transactionTypesListDTO, transactionTypesDelListDTO, transactionTypeDTO
+from ..dtos.tenant_dto import tenantQueryEmail, tenantQueryPrimaryKey, tenantQueryUpdateFlag,tenantsListDTO, tenantsDelListDTO, tenantDTO
 from ..database.db import get_session
-from ..repositories.transaction_type_repository import transactionTypeRepository
-from ..services.transaction_type_service import transactionTypeService
-from ..services.transaction_type_filehandler import transactionTypeFileHandler
-from ..models.transaction_types_model import transactionTypesModel
+from ..repositories.tenant_repository import tenantRepository
+from ..services.tenant_service import tenantService
+from ..services.tenant_filehandler import tenantFileHandler
+from ..models.tenants_model import tenantsModel
 import logging
 
 # DEFINITIONS
-get_pkey="/transactionTypes/pkey"
-get_all=post_all="/transactionTypes"
-send_transactionType_report="/transactionTypes/email"
-del_all = "/transactionTypesdel"
-excel_upload = "/transactionTypesxl"
-myObjects="transactionTypes"
-get_response_model=transactionTypesListDTO
-get_pkey_model = transactionTypeDTO
-del_response_model=transactionTypesDelListDTO
-myModel=transactionTypesModel
+get_pkey="/tenants/pkey"
+get_all=post_all="/tenants"
+send_tenant_report="/tenants/email"
+del_all = "/tenantsdel"
+excel_upload = "/tenantsxl"
+myObjects="tenants"
+get_response_model=tenantsListDTO
+get_pkey_model = tenantDTO
+del_response_model=tenantsDelListDTO
+myModel=tenantsModel
 
 router = APIRouter()
 
@@ -34,8 +34,8 @@ router = APIRouter()
         )
 
 async def get_all_records(db: AsyncSession = Depends(get_session)):
-    my_repository = transactionTypeRepository(db)
-    my_service = transactionTypeService(my_repository)
+    my_repository = tenantRepository(db)
+    my_service = tenantService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
     except Exception as e:
@@ -44,20 +44,20 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
 
 ############################################################################################################
 @router.get(
-        send_transactionType_report,
-        summary="Send transactionType report to email",
-        description="Send transactionType report to email",
+        send_tenant_report,
+        summary="Send tenant report to email",
+        description="Send tenant report to email",
         status_code=200,
         response_model=get_response_model,
         tags=["Get"],
         )
 
-async def send_transactionType_report(
-     query_params: transactionTypeQueryEmail = Depends(),
+async def send_tenant_report(
+     query_params: tenantQueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = transactionTypeRepository(db)
-    my_service = transactionTypeService(my_repository)
+    my_repository = tenantRepository(db)
+    my_service = tenantService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
         sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
@@ -78,14 +78,18 @@ async def send_transactionType_report(
         )
 
 async def get_record_by_pkey(
-    query_params: transactionTypeQueryPrimaryKey = Depends(),
+    query_params: tenantQueryPrimaryKey = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = transactionTypeRepository(db)
-    my_service = transactionTypeService(my_repository)
+    my_repository = tenantRepository(db)
+    my_service = tenantService(my_repository)
     try:
-        key_fields = {'transaction_group': query_params.transaction_group,
-                      'transaction_type':query_params.transaction_type}  # Adjust according to actual key fields
+        key_fields = {'customer': query_params.customer,
+                    'property_name': query_params.property_name,
+                    'unit_name': query_params.unit_name,
+                    'lease_start': query_params.lease_start,
+                    'lease_end': query_params.lease_end
+                      }  # Adjust according to actual key fields
         result = await my_service.extract_pkey(myModel,key_fields)
         if result is None:
             return {}
@@ -102,16 +106,21 @@ async def get_record_by_pkey(
         )
 async def create_or_update_data(
      input_data: get_response_model, 
-     query_params: transactionTypeQueryUpdateFlag = Depends(),
+     query_params: tenantQueryUpdateFlag = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = transactionTypeRepository(db)
-    my_service = transactionTypeService(my_repository)
+    my_repository = tenantRepository(db)
+    my_service = tenantService(my_repository)
     results = []
-    for record in input_data.transactionTypes:
+    for record in input_data.tenants:
         try:
-            key_fields = {'transaction_group': record.transaction_group,
-                      'transaction_type':record.transaction_type}  # Adjust according to actual key fields
+            key_fields = {
+                'customer': record.customer,
+                'property_name': record.property_name,
+                'unit_name': record.unit_name,
+                'lease_start': record.lease_start,
+                'lease_end': record.lease_end
+            }  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
@@ -120,23 +129,28 @@ async def create_or_update_data(
     return results
 ############################################################################################################
 
-@router.post(excel_upload, summary="Upload and save transactionTypes data from a CSV file")
+@router.post(excel_upload, summary="Upload and save tenants data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
-    query_params: transactionTypeQueryUpdateFlag = Depends(),
+    query_params: tenantQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    my_filehandler = transactionTypeFileHandler(file)
+    my_filehandler = tenantFileHandler(file)
     input_data = my_filehandler.extract_data_from_file()
 
-    my_repository = transactionTypeRepository(db)
-    my_service = transactionTypeService(my_repository)
+    my_repository = tenantRepository(db)
+    my_service = tenantService(my_repository)
     results = []
-    for record in input_data.transactionTypes:
+    for record in input_data.tenants:
         try:
-            key_fields = {'transaction_group': record.transaction_group,
-                      'transaction_type':record.transaction_type}  # Adjust according to actual key fields
+            key_fields = {
+                'customer': record.customer,
+                'property_name': record.property_name,
+                'unit_name': record.unit_name,
+                'lease_start': record.lease_start,
+                'lease_end': record.lease_end
+            }  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
@@ -153,13 +167,18 @@ async def upload_and_upsert_records(
         tags=["Delete"],
         )
 async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = transactionTypeRepository(db)
-    my_service = transactionTypeService(my_repository)
+    my_repository = tenantRepository(db)
+    my_service = tenantService(my_repository)
     results = []
-    for record in input_data.transactionTypesDel:   
+    for record in input_data.tenantsDel:   
         try:
-            key_fields = {'transaction_group': record.transaction_group,
-                      'transaction_type':record.transaction_type}  # Adjust according to actual key fields
+            key_fields = {
+                'customer': record.customer,
+                'property_name': record.property_name,
+                'unit_name': record.unit_name,
+                'lease_start': record.lease_start,
+                'lease_end': record.lease_end
+            }  # Adjust according to actual key fields
             deleted,result = await my_service.delete_records(record, myModel, key_fields)
             results.append( {"deleted": deleted,myObjects: result} )
         except Exception as e:

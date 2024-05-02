@@ -1,0 +1,87 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/tenants/email?receiver=vivekjadhav@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/tenants
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/tenants?tenant_name=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/tenants/pkey?customer=NVS&property_name=104Meadow
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/tenants?update=N
+Content-Type: application/json
+
+
+{
+    "tenants": [
+        {
+            "customer": "NVS",
+            "property_name": "104Meadow",
+            "lease_start": "2022-06-29",
+            "lease_end": "2023-06-29",
+            "rent": 1000,
+            "security_deposit": 1000
+        },
+        {
+            "customer": "Vivek",
+            "property_name": "108Meadow",
+            "lease_start": "2023-06-29",
+            "lease_end": "2024-06-29",
+            "rent": 1250,
+            "security_deposit": 1250
+        },
+        {
+            "customer": "LAS",
+            "property_name": "108Meadow",
+            "lease_start": "2023-07-29",
+            "lease_end": "2024-07-29",
+            "rent": 1200,
+            "security_deposit": 1200
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_tenants
+DELETE {{hostName}}/tenantsdel
+Content-Type: application/json
+
+
+{
+    "tenantsDel": [
+        {
+            "customer": "LAS",
+            "property_name": "108Meadow",
+            "lease_start": "2023-07-29",
+            "lease_end": "2024-07-29"
+        },
+        {
+            "customer": "PQW",
+            "property_name": "108Meadow",
+            "lease_start": "2023-07-29",
+            "lease_end": "2024-07-29"
+        },
+        {
+            "customer": "BBB",
+            "property_name": "108Meadow",
+            "lease_start": "2023-07-29",
+            "lease_end": "2024-07-29"
+        }
+    ]
+}
+############################################################################################
+

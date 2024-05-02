@@ -29,7 +29,7 @@ Content-Type: application/json
 {
     "customers": [
         {
-            "customer" : "W9-CUST_1",
+            "customer" : "NVS",
             "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
             "recipient_tin" : "99-39343433",
@@ -42,7 +42,7 @@ Content-Type: application/json
             "country" : "USA"
         },
         {
-            "customer" : "W9-CUST_2",
+            "customer" : "Vivek",
             "recipient_type" : "Individual",
             "recipient_tin_type" : "SSN",
             "recipient_tin" : "99-7676739",
@@ -55,7 +55,7 @@ Content-Type: application/json
             "country" : "USA"
         },
         {
-            "customer" : "NA",
+            "customer" : "LAS",
             "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
             "recipient_tin" : "99-999-999",

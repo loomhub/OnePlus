@@ -110,7 +110,7 @@ async def create_or_update_data(
     for record in input_data.vendors:
         try:
             key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -134,7 +134,7 @@ async def upload_and_upsert_records(
     for record in input_data.vendors:
         try:
             key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")

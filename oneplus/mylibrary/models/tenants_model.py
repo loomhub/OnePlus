@@ -14,6 +14,6 @@ class tenantsModel(Base):
     rent = Column(Numeric(10, 2))
     security_deposit = Column(Numeric(10, 2))
     __table_args__ = (
-        UniqueConstraint('customer', 'property_name', name='uix_tenant'),
+        UniqueConstraint('customer', 'property_name','unit_name','lease_start','lease_end', name='uix_tenant_leases'),
     )
     
