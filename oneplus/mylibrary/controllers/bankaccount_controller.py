@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.bankaccount_dto import bankaccountQueryEmail, bankaccountQueryPrimaryKey,bankaccountsListDTO, bankaccountsDelListDTO, bankaccountDTO
+from ..dtos.bankaccount_dto import bankaccountQueryEmail, bankaccountQueryPrimaryKey, bankaccountQueryUpdateFlag,bankaccountsListDTO, bankaccountsDelListDTO, bankaccountDTO
 from ..database.db import get_session
 from ..repositories.bankaccount_repository import bankaccountRepository
 from ..services.bankaccount_service import bankaccountService
@@ -84,9 +84,7 @@ async def get_record_by_pkey(
     my_repository = bankaccountRepository(db)
     my_service = bankaccountService(my_repository)
     try:
-        key_fields = {'bank': query_params.bank,
-                      'account_type':query_params.account_type,
-                      'account_number':query_params.account_number}  # Adjust according to actual key fields
+        key_fields = {'bank_account_key': query_params.bank_account_key}  # Adjust according to actual key fields
         result = await my_service.extract_pkey(myModel,key_fields)
         if result is None:
             return {}
@@ -101,16 +99,18 @@ async def get_record_by_pkey(
         description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+async def create_or_update_data(
+     input_data: get_response_model, 
+     query_params: bankaccountQueryUpdateFlag = Depends(),
+     db: AsyncSession = Depends(get_session)
+     ):
     my_repository = bankaccountRepository(db)
     my_service = bankaccountService(my_repository)
     results = []
     for record in input_data.bankaccounts:
         try:
-            key_fields = {'bank': record.bank,
-                      'account_type':record.account_type,
-                      'account_number':record.account_number}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            key_fields = {'bank_account_key': record.bank_account_key}  # Adjust according to actual key fields
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -121,6 +121,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
 @router.post(excel_upload, summary="Upload and save bankaccounts data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
+    query_params: bankaccountQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
@@ -132,10 +133,8 @@ async def upload_and_upsert_records(
     results = []
     for record in input_data.bankaccounts:
         try:
-            key_fields = {'bank': record.bank,
-                      'account_type':record.account_type,
-                      'account_number':record.account_number}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            key_fields = {'bank_account_key': record.bank_account_key}  # Adjust according to actual key fields
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -156,9 +155,7 @@ async def delete_record(input_data: del_response_model, db: AsyncSession = Depen
     results = []
     for record in input_data.bankaccountsDel:   
         try:
-            key_fields = {'bank': record.bank,
-                      'account_type':record.account_type,
-                      'account_number':record.account_number}  # Adjust according to actual key fields
+            key_fields = {'bank_account_key': record.bank_account_key}  # Adjust according to actual key fields
             deleted,result = await my_service.delete_records(record, myModel, key_fields)
             results.append( {"deleted": deleted,myObjects: result} )
         except Exception as e:

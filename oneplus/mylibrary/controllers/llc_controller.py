@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.llc_dto import LLCQueryEmail, LLCQueryParams,LLCQueryPrimaryKey,llcsListDTO, llcsDelListDTO, llcDTO
+from ..dtos.llc_dto import LLCQueryEmail, LLCQueryParams,LLCQueryPrimaryKey, llcQueryUpdateFlag,llcsListDTO, llcsDelListDTO, llcDTO
 from ..database.db import get_session
 from ..repositories.llc_repository import LLCRepository
 from ..services.llc_service import llcService
@@ -134,14 +134,18 @@ async def get_llcs_by_name_and_date(
         description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+async def create_or_update_data(
+     input_data: get_response_model, 
+     query_params: llcQueryUpdateFlag = Depends(),
+     db: AsyncSession = Depends(get_session)
+     ):
     my_repository = LLCRepository(db)
     my_service = llcService(my_repository)
     results = []
     for record in input_data.llcs:
         try:
             key_fields = {'llc': record.llc}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -152,6 +156,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
 @router.post(excel_upload, summary="Upload and save LLCs data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
+    query_params: llcQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
@@ -164,7 +169,7 @@ async def upload_and_upsert_records(
     for record in input_data.llcs:
         try:
             key_fields = {'llc': record.llc}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")

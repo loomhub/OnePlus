@@ -55,16 +55,16 @@ Content-Type: application/json
             "country" : "USA"
         },
         {
-            "customer" : "W9-CUST3",
-            "recipient_type" : "Individual",
+            "customer" : "NA",
+            "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
-            "recipient_tin" : "99-394332",
-            "last_name" : "AAA Csutomer",
-            "first_name" : "AAA Customer",
-            "address" : "8798 SouthHorse Dr ",
-            "city" : "Tijuana",
-            "state" : "TX",
-            "zip_code" : "75098",
+            "recipient_tin" : "99-999-999",
+            "last_name" : "Not Applicable",
+            "first_name" : "Not Applicable",
+            "address" : "Not Applicable",
+            "city" : "Not Applicable",
+            "state" : "NA",
+            "zip_code" : "99999",
             "country" : "USA"
         }
     ]

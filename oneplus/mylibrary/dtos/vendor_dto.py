@@ -54,6 +54,9 @@ class vendorQueryPrimaryKey(BaseModel):
 class vendorQueryEmail(BaseModel):
     receiver: Optional[str] = Field(None, description="Name of the email receiver")
 
+class vendorQueryUpdateFlag(BaseModel):
+    update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
+
 
 VENDOR_COLUMNS = {
     'Vendor': 'vendor',

@@ -14,7 +14,7 @@ class myFileHandler:
         self.file=file
         self.file_location = f"uploads/{file.filename}"
         self.dir='uploads'
-
+#############################################################################################################
     def save_file_to_disk(self):
         # Check if the uploads directory exists, if not, create it
         if not os.path.exists(self.dir):
@@ -25,13 +25,13 @@ class myFileHandler:
                 shutil.copyfileobj(self.file.file, buffer)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Could not write to file: {str(e)}")
-
+#############################################################################################################
     def read_data(self):
         try:
-            return pd.read_csv(self.file_location)
+            return pd.read_csv(self.file_location, na_values=[])
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to load file into DataFrame: {str(e)}")
-
+#############################################################################################################
     def convert_dataframe_to_list_dto(
             self,
             df: pd.DataFrame, #pandas.DataFrame containing the data.
@@ -58,7 +58,7 @@ class myFileHandler:
         print(type(dto_list))   
     
         return dto_list
-
+#############################################################################################################
     def convert_columns_to_date(self, 
                         df: pd.DataFrame, 
                         column_names: List[str],
@@ -75,20 +75,21 @@ class myFileHandler:
             else:
                 print(f"Column {column_name} not found in DataFrame.")
         return df
-    
+#############################################################################################################    
     def convert_columns_to_string(self, 
                         df: pd.DataFrame, 
-                        column_names: List[str]) -> pd.DataFrame:
+                        column_names: List[str],**kwargs) -> pd.DataFrame:
+        na_values = kwargs.get('na_values', '')
         for column_name in column_names:
             if column_name in df.columns:
                 try:
-                    df[column_name] = df[column_name].fillna('').astype(str)
+                    df[column_name] = df[column_name].fillna(na_values).astype(str)
                 except Exception as e:
                     print(f"Error converting {column_name}: {e}")
             else:
                 print(f"Column {column_name} not found in DataFrame.")
         return df
-    
+#############################################################################################################    
     def convert_columns_to_numeric(self, 
                         df: pd.DataFrame, 
                         column_names: List[str]) -> pd.DataFrame:
@@ -104,7 +105,7 @@ class myFileHandler:
             else:
                 print(f"Column {column_name} not found in DataFrame.")
         return df
-    
+#############################################################################################################    
     def convert_columns_to_int(self, 
                         df: pd.DataFrame, 
                         column_names: List[str]) -> pd.DataFrame:

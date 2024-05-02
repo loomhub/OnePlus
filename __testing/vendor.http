@@ -29,16 +29,16 @@ Content-Type: application/json
 {
     "vendors": [
         {
-            "vendor" : "W9-AAA_SERVICES",
+            "vendor" : "NA",
             "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
-            "recipient_tin" : "99-3999953",
-            "last_name" : "AAA SERVICES",
-            "first_name" : "AAA SERVICES",
-            "address" : "8798 SouthBall Dr ",
-            "city" : "Tijuana",
-            "state" : "TX",
-            "zip_code" : "75098",
+            "recipient_tin" : "99-999-999",
+            "last_name" : "Not Applicable",
+            "first_name" : "Not Applicable",
+            "address" : "Not Applicable",
+            "city" : "Not Applicable",
+            "state" : "NA",
+            "zip_code" : "99999",
             "country" : "USA"
         },
         {

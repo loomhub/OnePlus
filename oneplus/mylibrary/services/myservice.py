@@ -46,7 +46,7 @@ class MyService:
 
     ############################################################################################################
 
-    async def upsert_records(self, data_dto:DTO, model: Type[BaseModel], key_fields: dict) -> Tuple[bool, BaseModel]:
+    async def upsert_records(self, data_dto:DTO, model: Type[BaseModel], key_fields: dict,**kwargs) -> Tuple[bool, BaseModel]:
         """
         Upsert an entity based on the provided data.
         :param data_dto: Data transfer object containing entity details
@@ -54,19 +54,28 @@ class MyService:
         :param key_fields: Dictionary of key fields and their corresponding values from data_dto
         :return: Tuple containing boolean (True if created, False if updated) and entity instance
         """
+        update = kwargs.get('update', None)
         try:
             filters = {field: getattr(data_dto, field) for field in key_fields}
             entity_instance = await self.repository.retrieve_unique_record(model, filters)
 
-            if entity_instance:
-                # Update it
+            if not(entity_instance): # Entity instance does not exist -> Create
+                entity_instance = model(**data_dto.dict())
+                self.repository.db_session.add(entity_instance)
+                await self.repository.db_session.commit()
+                created = True
+            
+            elif update == 'X': # Update = 'X' , Entity instance exists -> Delete and Create
                 deleted = await self.repository.delete_data(entity_instance)
                 await self.repository.commit_changes()
+                entity_instance = model(**data_dto.dict())
+                self.repository.db_session.add(entity_instance)
+                await self.repository.db_session.commit()
+                created = True
+
+            else: # Update = None , Entity instance exists -> Dont delete, don't create
+                created = False
             
-            entity_instance = model(**data_dto.dict())
-            self.repository.db_session.add(entity_instance)
-            await self.repository.db_session.commit()
-            created = True
             return created, entity_instance
 
         except Exception as e:

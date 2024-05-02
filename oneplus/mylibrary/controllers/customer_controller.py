@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.customer_dto import customerQueryEmail, customerQueryPrimaryKey,customersListDTO, customersDelListDTO, customerDTO
+from ..dtos.customer_dto import customerQueryEmail, customerQueryPrimaryKey, customerQueryUpdateFlag,customersListDTO, customersDelListDTO, customerDTO
 from ..database.db import get_session
 from ..repositories.customer_repository import customerRepository
 from ..services.customer_service import customerService
@@ -99,14 +99,17 @@ async def get_record_by_pkey(
         description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+async def create_or_update_data(
+     input_data: get_response_model, 
+     query_params: customerQueryUpdateFlag = Depends(),
+     db: AsyncSession = Depends(get_session)):
     my_repository = customerRepository(db)
     my_service = customerService(my_repository)
     results = []
     for record in input_data.customers:
         try:
             key_fields = {'customer': record.customer}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -117,6 +120,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
 @router.post(excel_upload, summary="Upload and save customers data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
+    query_params: customerQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
@@ -129,7 +133,7 @@ async def upload_and_upsert_records(
     for record in input_data.customers:
         try:
             key_fields = {'customer': record.customer}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")

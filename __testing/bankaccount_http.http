@@ -16,7 +16,7 @@ GET {{hostName}}/search/bankaccounts?bankaccount_name=Y&start_date=1990-12-31
 Content-Type: application/json
 
 ############################################################################################
-GET {{hostName}}/bankaccounts/pkey?bankaccount_name=MID
+GET {{hostName}}/bankaccounts/pkey?bank_account_key=Dummy
 Content-Type: application/json    
 
 
@@ -29,12 +29,14 @@ Content-Type: application/json
 {
     "bankaccounts": [
         {
+            "bank_account_key": "MeadowSecurity",
             "bank": "Wells Fargo",
             "account_type": "Checking",
             "account_number": "1160333314",
             "llc": "MDW"
         },
         {
+            "bank_account_key": "104Meadow",
             "bank": "Wells Fargo",
             "account_type": "Checking",
             "account_number": "2123710218",
@@ -42,6 +44,7 @@ Content-Type: application/json
             "property_name": "104Meadow"
         },
         {
+            "bank_account_key": "Dummy",
             "bank": "Chase",
             "account_type": "Checking",
             "account_number": "Dummy",
@@ -59,19 +62,13 @@ Content-Type: application/json
 {
     "bankaccountsDel": [
         {
-            "bank": "Chase",
-            "account_type": "Checking",
-            "account_number": "Dummy"
+            "bank_account_key": "Chase"
         },
         {
-            "bank": "Vivek",
-            "account_type": "Checking",
-            "account_number": "Dummy"
+            "bank_account_key": "Dummy"
         },
         {
-            "bank": "Jadhav",
-            "account_type": "Checking",
-            "account_number": "Dummy"
+            "bank_account_key": "Vivek"
         }
     ]
 }

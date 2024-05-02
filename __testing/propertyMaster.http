@@ -29,13 +29,12 @@ Content-Type: application/json
 {
     "propertyMasters": [
         {
-            "property_name": "104Meadow",
-            "property_description": "104 Meadowview Lane Anna TX 75409",
-            "llc": "MDW",
-            "note": "VJ",
+            "property_name": "NVPartnership",
+            "property_description": "Neeraj Vivek Partnership",
+            "llc": "NV",
             "purchase_date": "2013-08-15",
-            "purchase_price": 145000,
-            "units": 1,
+            "purchase_price": 10000000,
+            "units": 10000,
             "county": "Collin"
     },
         {

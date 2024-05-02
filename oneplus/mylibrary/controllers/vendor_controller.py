@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.vendor_dto import vendorQueryEmail, vendorQueryPrimaryKey,vendorsListDTO, vendorsDelListDTO, vendorDTO
+from ..dtos.vendor_dto import vendorQueryEmail, vendorQueryPrimaryKey, vendorQueryUpdateFlag,vendorsListDTO, vendorsDelListDTO, vendorDTO
 from ..database.db import get_session
 from ..repositories.vendor_repository import vendorRepository
 from ..services.vendor_service import vendorService
@@ -99,14 +99,18 @@ async def get_record_by_pkey(
         description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+async def create_or_update_data(
+     input_data: get_response_model, 
+     query_params: vendorQueryUpdateFlag = Depends(),
+     db: AsyncSession = Depends(get_session)
+     ):
     my_repository = vendorRepository(db)
     my_service = vendorService(my_repository)
     results = []
     for record in input_data.vendors:
         try:
             key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -117,6 +121,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
 @router.post(excel_upload, summary="Upload and save vendors data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
+    query_params: vendorQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
@@ -129,7 +134,7 @@ async def upload_and_upsert_records(
     for record in input_data.vendors:
         try:
             key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")

@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.sample_dto import sampleQueryEmail, sampleQueryPrimaryKey,samplesListDTO, samplesDelListDTO, sampleDTO
+from ..dtos.sample_dto import sampleQueryEmail, sampleQueryPrimaryKey, sampleQueryUpdateFlag,samplesListDTO, samplesDelListDTO, sampleDTO
 from ..database.db import get_session
 from ..repositories.sample_repository import sampleRepository
 from ..services.sample_service import sampleService
@@ -99,14 +99,18 @@ async def get_record_by_pkey(
         description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+async def create_or_update_data(
+     input_data: get_response_model, 
+     query_params: sampleQueryUpdateFlag = Depends(),
+     db: AsyncSession = Depends(get_session)
+     ):
     my_repository = sampleRepository(db)
     my_service = sampleService(my_repository)
     results = []
     for record in input_data.samples:
         try:
             key_fields = {'primary': record.primary}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -117,6 +121,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
 @router.post(excel_upload, summary="Upload and save samples data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
+    query_params: sampleQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
@@ -129,7 +134,7 @@ async def upload_and_upsert_records(
     for record in input_data.samples:
         try:
             key_fields = {'primary': record.primary}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")

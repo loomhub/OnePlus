@@ -8,6 +8,7 @@ from mylibrary.controllers.vendor_controller import router as vendor_router
 from mylibrary.controllers.customer_controller import router as customer_router
 from mylibrary.controllers.emailConfig_controller import router as emailConfig_router
 from mylibrary.controllers.transaction_type_controller import router as transactionType_router
+from mylibrary.controllers.transaction_controller import router as transaction_router
 from mylibrary.database.db import Base, sync_engine
 
 app = FastAPI(debug=True)
@@ -19,6 +20,7 @@ app.include_router(customer_router)
 app.include_router(transactionType_router)
 app.include_router(propertyMaster_router)
 app.include_router(bankaccount_router)
+app.include_router(transaction_router)
 
 # Ensure the database tables are created
 Base.metadata.create_all(sync_engine)

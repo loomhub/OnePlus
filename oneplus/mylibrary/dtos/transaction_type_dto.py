@@ -41,6 +41,9 @@ class transactionTypeQueryPrimaryKey(BaseModel):
 class transactionTypeQueryEmail(BaseModel):
     receiver: Optional[str] = Field(None, description="Name of the email receiver")
 
+class transactionTypeQueryUpdateFlag(BaseModel):
+    update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
+
 
 TRANSACTION_TYPES_COLUMNS = {
     'Transaction Group': 'transaction_group',

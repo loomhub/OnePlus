@@ -1,0 +1,7 @@
+﻿Bank Key,Date,Description,Details,Classification,Period Status,Amount,Group,Type,Vendor,Customer,General Vendor,General Customer,Comments
+104Meadow,9/17/13,Shell Mckinney,Gas Pagoda,Clean,closed,($9.17),A02 - Expense,Exp-Repair,W9-ADELINA,,Shell Mckinney,,
+104Meadow,9/30/13,,Made 4 payments through Neeraj to Pagoda LLC,Clean,closed,"$16,000.00 ",A01 - Revenue,Rev-Rent,,,,108Pagoda,
+TrustAccount,10/16/13,,Made payment Pagoda LLC,Clean,closed,"$10,000.00 ",A06 - Funding,Owner-Funding,,,,108Pagoda,
+Common,10/17/13,UPS Notary,Notarized Pagoda Homes closing documents and shipped overnite,Clean,closed,($108.00),A03 - Capex,Capex-Install,W9-JULIAN,,UPS Notary,104Meadow,104Meadow Purchase
+MeadowSecurity,10/17/13,,Made payment Pagoda LLC,Clean,closed,"$8,000.00 ",A07 - Security Deposit,Liab-Security,,,,108Pagoda,
+MeadowSecurity,10/18/13,Title Company,Closing 108 Pagoda,Clean,closed,"($29,954.84)",A07 - Security Deposit,Liab-Security,,,Title Company,108Pagoda,Title Company

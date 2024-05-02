@@ -1,7 +1,7 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.transaction_type_dto import transactionTypeQueryEmail, transactionTypeQueryPrimaryKey,transactionTypesListDTO, transactionTypesDelListDTO, transactionTypeDTO
+from ..dtos.transaction_type_dto import transactionTypeQueryEmail, transactionTypeQueryPrimaryKey, transactionTypeQueryUpdateFlag,transactionTypesListDTO, transactionTypesDelListDTO, transactionTypeDTO
 from ..database.db import get_session
 from ..repositories.transaction_type_repository import transactionTypeRepository
 from ..services.transaction_type_service import transactionTypeService
@@ -100,7 +100,11 @@ async def get_record_by_pkey(
         description="Create or edit multiple records",
         tags=["Upsert"],
         )
-async def create_or_update_data(input_data: get_response_model, db: AsyncSession = Depends(get_session)):
+async def create_or_update_data(
+     input_data: get_response_model, 
+     query_params: transactionTypeQueryUpdateFlag = Depends(),
+     db: AsyncSession = Depends(get_session)
+     ):
     my_repository = transactionTypeRepository(db)
     my_service = transactionTypeService(my_repository)
     results = []
@@ -108,7 +112,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
         try:
             key_fields = {'transaction_group': record.transaction_group,
                       'transaction_type':record.transaction_type}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -119,6 +123,7 @@ async def create_or_update_data(input_data: get_response_model, db: AsyncSession
 @router.post(excel_upload, summary="Upload and save transactionTypes data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
+    query_params: transactionTypeQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
@@ -132,7 +137,7 @@ async def upload_and_upsert_records(
         try:
             key_fields = {'transaction_group': record.transaction_group,
                       'transaction_type':record.transaction_type}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")

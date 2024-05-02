@@ -54,6 +54,9 @@ class customerQueryPrimaryKey(BaseModel):
 class customerQueryEmail(BaseModel):
     receiver: Optional[str] = Field(None, description="Name of the email receiver")
 
+class customerQueryUpdateFlag(BaseModel):
+    update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
+
 
 CUSTOMER_COLUMNS = {
     'Customer': 'customer',

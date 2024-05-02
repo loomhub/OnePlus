@@ -42,6 +42,9 @@ class emailConfigQueryParams(BaseModel):
 class emailConfigQueryPrimaryKey(BaseModel):
     subject: Optional[str] = Field(None, description="Name of the subject to filter by")
 
+class emailConfigQueryUpdateFlag(BaseModel):
+    update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
+
 EMAIL_CONFIG_COLUMNS = {
     'Subject': 'subject',
     'Endpoint': 'endpoint',

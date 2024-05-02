@@ -10,7 +10,7 @@ class bankaccountFileHandler(myFileHandler):
         self.save_file_to_disk()
         df = self.read_data()
         df.rename(columns=BANK_ACCOUNTS_COLUMNS, inplace=True)
-        df=self.convert_columns_to_string(df, ['bank_name','account_type','account_number','llc','property_name'])
+        df=self.convert_columns_to_string(df, ['bank_account_key','bank','account_type','account_number','llc'])
         try:
             bankaccounts_data = self.convert_dataframe_to_list_dto(df,bankaccountDTO)
             return bankaccountsListDTO(bankaccounts=bankaccounts_data)
