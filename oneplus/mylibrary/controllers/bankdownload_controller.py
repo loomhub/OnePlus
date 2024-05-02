@@ -1,24 +1,26 @@
+
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.transaction_dto import transactionQueryEmail, transactionQueryPrimaryKey, transactionQueryUpdateFlag,transactionsListDTO, transactionsDelListDTO, transactionDTO
+from ..dtos.bankdownload_dto import CHASE_COLUMNS, WELLSFARGO_COLUMNS, WELLSFARGO_FILEHEADERS, bankdownloadQueryEmail, bankdownloadQueryPrimaryKey, bankdownloadQueryUpdateFlag,bankdownloadsListDTO, bankdownloadsDelListDTO, bankdownloadDTO
 from ..database.db import get_session
-from ..repositories.transaction_repository import transactionRepository
-from ..services.transaction_service import transactionService
-from ..services.transaction_filehandler import transactionFileHandler
-from ..models.transactions_model import transactionsModel
+from ..repositories.bankdownload_repository import bankdownloadRepository
+from ..services.bankdownload_service import bankdownloadService
+from ..services.bankdownload_filehandler import bankdownloadFileHandler
+from ..models.bankdownloads_model import bankdownloadsModel
 import logging
 
 # DEFINITIONS
-get_pkey="/transactions/pkey"
-get_all=post_all="/transactions"
-send_transaction_report="/transactions/email"
-del_all = "/transactionsdel"
-excel_upload = "/transactionsxl"
-myObjects="transactions"
-get_response_model=transactionsListDTO
-get_pkey_model = transactionDTO
-del_response_model=transactionsDelListDTO
-myModel=transactionsModel
+get_pkey="/bankdownloads/pkey"
+get_all=post_all="/bankdownloads"
+send_bankdownload_report="/bankdownloads/email"
+del_all = "/bankdownloadsdel"
+chase_upload = "/chasexl"
+wellsfargo_upload = "/wellsfargoxl"
+myObjects="bankdownloads"
+get_response_model=bankdownloadsListDTO
+get_pkey_model = bankdownloadDTO
+del_response_model=bankdownloadsDelListDTO
+myModel=bankdownloadsModel
 
 router = APIRouter()
 
@@ -33,8 +35,8 @@ router = APIRouter()
         )
 
 async def get_all_records(db: AsyncSession = Depends(get_session)):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
     except Exception as e:
@@ -43,20 +45,20 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
 
 ############################################################################################################
 @router.get(
-        send_transaction_report,
-        summary="Send transaction report to email",
-        description="Send transaction report to email",
+        send_bankdownload_report,
+        summary="Send bankdownload report to email",
+        description="Send bankdownload report to email",
         status_code=200,
         response_model=get_response_model,
         tags=["Get"],
         )
 
-async def send_transaction_report(
-     query_params: transactionQueryEmail = Depends(),
+async def send_bankdownload_report(
+     query_params: bankdownloadQueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
         sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
@@ -77,11 +79,11 @@ async def send_transaction_report(
         )
 
 async def get_record_by_pkey(
-    query_params: transactionQueryPrimaryKey = Depends(),
+    query_params: bankdownloadQueryPrimaryKey = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
     try:
         key_fields = {'bank_account_key': query_params.bank_account_key,
                         'tdate': query_params.tdate,
@@ -104,20 +106,20 @@ async def get_record_by_pkey(
         )
 async def create_or_update_data(
      input_data: get_response_model, 
-     query_params: transactionQueryUpdateFlag = Depends(),
+     query_params: bankdownloadQueryUpdateFlag = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
     results = []
-    for record in input_data.transactions:
+    for record in input_data.bankdownloads:
         try:
             key_fields = {'bank_account_key': record.bank_account_key,
                         'tdate': record.tdate,
                         'description': record.description,
                         'amount': record.amount
                           }  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields,update=query_params.update)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -125,27 +127,62 @@ async def create_or_update_data(
     return results
 ############################################################################################################
 
-@router.post(excel_upload, summary="Upload and save transactions data from a CSV file")
+@router.post(chase_upload, summary="Upload and save bankdownloads data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
-    query_params: transactionQueryUpdateFlag = Depends(),
+    query_params: bankdownloadQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    my_filehandler = transactionFileHandler(file)
-    input_data = my_filehandler.extract_data_from_file()
+    my_filehandler = bankdownloadFileHandler(file)
+    input_data = my_filehandler.extract_data_from_file(
+        column_names = CHASE_COLUMNS,
+        rename_columns = 'X',
+        fileheaders = None
+    )
 
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
     results = []
-    for record in input_data.transactions:
+    for record in input_data.bankdownloads:
         try:
             key_fields = {'bank_account_key': record.bank_account_key,
                         'tdate': record.tdate,
                         'description': record.description,
                         'amount': record.amount
                           }  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields,update = query_params.update)
+            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
+            results.append( {"created": created, myObjects: result} )
+        except Exception as e:
+            logging.error(f"Failed to update or create record: {str(e)}")
+            raise HTTPException(status_code=400, detail=str(e))
+    return results
+    
+############################################################################################################
+@router.post(wellsfargo_upload, summary="Upload and save bankdownloads data from a CSV file")
+async def upload_and_upsert_records(
+    file: UploadFile = File(...),
+    query_params: bankdownloadQueryUpdateFlag = Depends(),
+    db: AsyncSession = Depends(get_session)
+                                   ):
+    
+    my_filehandler = bankdownloadFileHandler(file)
+    input_data = my_filehandler.extract_data_from_file(
+        column_names = WELLSFARGO_COLUMNS,
+        rename_columns = None,
+        fileheaders = WELLSFARGO_FILEHEADERS
+    )
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
+    results = []
+    for record in input_data.bankdownloads:
+        try:
+            key_fields = {'bank_account_key': record.bank_account_key,
+                        'tdate': record.tdate,
+                        'description': record.description,
+                        'amount': record.amount
+                          }  # Adjust according to actual key fields
+            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
             logging.error(f"Failed to update or create record: {str(e)}")
@@ -161,10 +198,10 @@ async def upload_and_upsert_records(
         tags=["Delete"],
         )
 async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
     results = []
-    for record in input_data.transactionsDel:   
+    for record in input_data.bankdownloadsDel:   
         try:
             key_fields = {'bank_account_key': record.bank_account_key,
                         'tdate': record.tdate,

@@ -26,9 +26,13 @@ class myFileHandler:
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Could not write to file: {str(e)}")
 #############################################################################################################
-    def read_data(self):
+    def read_data(self,**kwargs):
+        column_names = kwargs.get('column_names', None)
         try:
-            return pd.read_csv(self.file_location, na_values=[])
+            if column_names:
+                return pd.read_csv(self.file_location, na_values=[], header=None, names=column_names)
+            else:
+                return pd.read_csv(self.file_location, na_values=[])
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to load file into DataFrame: {str(e)}")
 #############################################################################################################
@@ -118,3 +122,17 @@ class myFileHandler:
             else:
                 print(f"Column {column_name} not found in DataFrame.")
         return df
+#############################################################################################################
+    def adjust_columns(self,
+                        df: pd.DataFrame, 
+                        columns, 
+                        **kwargs) -> pd.DataFrame:
+        remove_starting_with = kwargs.get('remove_starting_with', None)
+
+        if remove_starting_with:
+            columns_to_remove = [value for key, value in columns.items() if value.startswith(remove_starting_with)]
+            columns = [col for col in columns if not col.startswith(remove_starting_with)]
+            df.drop(columns=columns_to_remove, inplace=True)
+            return df
+#############################################################################################################
+        

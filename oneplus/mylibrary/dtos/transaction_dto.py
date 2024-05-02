@@ -6,7 +6,6 @@ class transactionDTO(BaseModel):
     bank_account_key : Optional[str] = None
     tdate : Optional[date] = None
     description : Optional[str] = None
-    details : Optional[str] = None
     amount : Optional[float] = None
     classification : Optional[str] = None
     period_status : Optional[str] = None
@@ -25,7 +24,6 @@ class transactionFullDTO(BaseModel):
     bank_account_key : Optional[str] = None
     tdate : Optional[date] = None
     description : Optional[str] = None
-    details : Optional[str] = None
     amount : Optional[float] = None
     classification : Optional[str] = None
     period_status : Optional[str] = None
@@ -49,7 +47,6 @@ class transactionDelDTO(BaseModel):
     bank_account_key: Optional[str] = Field(None, description="Name of the bankaccount to filter by")
     tdate: Optional[date] = Field(None, description="Date of the transaction to filter by")
     description: Optional[str] = Field(None, description="Description of the transaction to filter by")
-    details: Optional[str] = Field(None, description="Details of the transaction to filter by")
     amount: Optional[float] = Field(None, description="Amount of the transaction to filter by")
 
 class transactionsDelListDTO(BaseModel):
@@ -59,7 +56,6 @@ class transactionQueryParams(BaseModel):
     bank_account_key: Optional[str] = Field(None, description="Name of the bankaccount to filter by")
     tdate: Optional[date] = Field(None, description="Date of the transaction to filter by")
     description: Optional[str] = Field(None, description="Description of the transaction to filter by")
-    details: Optional[str] = Field(None, description="Details of the transaction to filter by")
     amount: Optional[float] = Field(None, description="Amount of the transaction to filter by")
     
     
@@ -67,7 +63,6 @@ class transactionQueryPrimaryKey(BaseModel):
     bank_account_key: Optional[str] = Field(None, description="Name of the bankaccount to filter by")
     tdate: Optional[date] = Field(None, description="Date of the transaction to filter by")
     description: Optional[str] = Field(None, description="Description of the transaction to filter by")
-    details: Optional[str] = Field(None, description="Details of the transaction to filter by")
     amount: Optional[float] = Field(None, description="Amount of the transaction to filter by")
     
 class transactionQueryEmail(BaseModel):
@@ -80,7 +75,6 @@ TRANSACTIONS_COLUMNS = {
     'Bank Key': 'bank_account_key',
     'Date': 'tdate',
     'Description': 'description',
-    'Details': 'details',
     'Amount': 'amount',
     'Classification': 'classification',
     'Period Status': 'period_status',

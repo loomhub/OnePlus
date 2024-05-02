@@ -8,7 +8,6 @@ class transactionsModel(Base):
     bank_account_key = Column(String,ForeignKey('bankaccounts.bank_account_key'),nullable=False,index=True)
     tdate = Column(Date,nullable=False,index=True)
     description = Column(String,nullable=False, index=True)
-    details = Column(String,nullable=False, index=True)
     amount = Column(Numeric(10, 2),nullable=False,index=True)
     classification = Column(String)
     period_status = Column(String)
@@ -20,6 +19,6 @@ class transactionsModel(Base):
     vendor_no_w9 = Column(String)
     customer_no_w9 = Column(String)
     __table_args__ = (
-        UniqueConstraint('bank_account_key','tdate', 'description','details' ,'amount', name='uix_transaction'),
+        UniqueConstraint('bank_account_key','tdate', 'description','amount', name='uix_transaction'),
     )
     
