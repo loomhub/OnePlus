@@ -72,8 +72,7 @@ class myFileHandler:
             if column_name in df.columns:
                 try:
                     df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
-                    df[column_name] = pd.to_datetime(df[column_name]).dt.date
-                    
+                    df[column_name] = pd.to_datetime(df[column_name], format='%m/%d/%y', errors='coerce').dt.date
                 except Exception as e:
                     print(f"Error converting {column_name}: {e}")
             else:

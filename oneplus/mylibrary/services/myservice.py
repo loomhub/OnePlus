@@ -65,13 +65,14 @@ class MyService:
                 await self.repository.db_session.commit()
                 created = True
             
-            elif update == 'X': # Update = 'X' , Entity instance exists -> Delete and Create
-                deleted = await self.repository.delete_data(entity_instance)
-                await self.repository.commit_changes()
-                entity_instance = model(**data_dto.dict())
-                self.repository.db_session.add(entity_instance)
+            elif update == 'X': # Update = 'X' , Entity instance exists -> Edit entity
+                for key, value in data_dto.dict().items():
+                    if hasattr(entity_instance, key):
+                        setattr(entity_instance, key, value)
+
+                self.repository.db_session.add(entity_instance)  # In case the session doesn't track the instance
                 await self.repository.db_session.commit()
-                created = True
+                created = True  # Since this is an update, not a create
 
             else: # Update = None , Entity instance exists -> Dont delete, don't create
                 created = False

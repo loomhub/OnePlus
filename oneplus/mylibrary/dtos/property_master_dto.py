@@ -14,7 +14,10 @@ class propertyMasterDTO(BaseModel):
     units: Optional[int] = None
     county: Optional[str] = None
     class Config:
-        orm_mode = True
+        json_encoders = {
+            date: lambda v: v.strftime('%Y-%m-%d'),
+            float: lambda v: float('nan') if v in [float('inf'), float('-inf'), float('nan')] else v
+        }
 
 class propertyMasterFullDTO(BaseModel):
     id : Optional[int] = None
@@ -29,7 +32,10 @@ class propertyMasterFullDTO(BaseModel):
     units: Optional[int] = None
     county: Optional[str] = None
     class Config:
-        orm_mode = True
+        json_encoders = {
+            date: lambda v: v.strftime('%Y-%m-%d'),
+            float: lambda v: float('nan') if v in [float('inf'), float('-inf'), float('nan')] else v
+        }
 
 class propertyMastersListDTO(BaseModel):
     propertyMasters: List[propertyMasterDTO]

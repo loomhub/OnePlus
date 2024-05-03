@@ -22,38 +22,19 @@ Content-Type: application/json
 
 ############################################################################################
 # @name post_transactions
-POST {{hostName}}/propertyMasters
+POST {{hostName}}/propertyMasters?update=X
 Content-Type: application/json
 
 
 {
     "propertyMasters": [
         {
-            "property_name": "NVPartnership",
-            "property_description": "Neeraj Vivek Partnership",
-            "llc": "NV",
-            "purchase_date": "2013-08-15",
-            "purchase_price": 10000000,
-            "units": 10000,
-            "county": "Collin"
-    },
-        {
-            "property_name": "108Meadow",
-            "property_description": "108 Meadowview Lane Anna TX 75409",
+            "property_name": "104Meadow",
+            "property_description": "104 Meadow View Lane Anna TX 75409",
             "llc": "MDW",
-            "note": "PG",
-            "purchase_date": "2014-03-15",
-            "purchase_price": 145000,
-            "units": 1,
-            "county": "Collin"
-    },
-        {
-            "property_name": "108Pagoda",
-            "property_description": "108 Pagoda Drive Anna TX 75409",
-            "llc": "PAG",
-            "note": "NG",
-            "purchase_date": "2013-08-20",
-            "purchase_price": 143000,
+            "note": "VJ",
+            "purchase_date": "2013-10-29",
+            "purchase_price": 122197,
             "units": 1,
             "county": "Collin"
     }
@@ -69,7 +50,7 @@ Content-Type: application/json
 {
     "propertyMastersDel": [
         {
-            "property_name": "104Meadow" 
+            "property_name": "NVPartnership" 
         },
         {
             "property_name": "10Meadow" 
