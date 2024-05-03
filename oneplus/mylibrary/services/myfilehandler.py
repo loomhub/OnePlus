@@ -79,7 +79,23 @@ class myFileHandler:
             else:
                 print(f"Column {column_name} not found in DataFrame.")
         return df
-#############################################################################################################    
+#############################################################################################################   
+    def convert_month_to_date(self, 
+                            df: pd.DataFrame, 
+                            column_names: List[str],
+                            **kwargs) -> pd.DataFrame:
+            null_value_date = kwargs.get('null_value_date', '2099-12-31')
+            for column_name in column_names:
+                if column_name in df.columns:
+                    try:
+                        df[column_name] = pd.to_datetime(df[column_name]).dt.date
+                        df[column_name] = pd.to_datetime(df[column_name]).dt.to_period('M').dt.to_timestamp()
+                    except Exception as e:
+                        print(f"Error converting {column_name}: {e}")
+                else:
+                    print(f"Column {column_name} not found in DataFrame.")
+            return df
+############################################################################################################# 
     def convert_columns_to_string(self, 
                         df: pd.DataFrame, 
                         column_names: List[str],**kwargs) -> pd.DataFrame:

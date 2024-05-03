@@ -1,0 +1,72 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/balances/email?receiver=vivekjadhav@yahoo.com
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/balances
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/balances?balance_name=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/balances/pkey?balance_name=MID
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/balances
+Content-Type: application/json
+
+
+{
+    "balances": [
+        {
+            "bank_account_key" : "104Meadow",
+            "snapshot": "2022-06-01",
+            "balance": "1200"
+        },
+        {
+            "bank_account_key" : "TrustAccount",
+            "snapshot": "2023-06-01",
+            "balance": "1200"
+        },
+        {
+            "bank_account_key" : "108Meadow",
+            "snapshot": "2023-07-01",
+            "balance": "1600"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_balances
+DELETE {{hostName}}/balancesdel
+Content-Type: application/json
+
+
+{
+    "balancesDel": [
+        {
+            "bank_account_key" : "TrustAccount",
+            "snapshot": "2023-06-01"
+        },
+        {
+            "bank_account_key" : "TrustAccount",
+            "snapshot": "2023-09-01"
+        },
+        {
+            "bank_account_key" : "TrustAccount",
+            "snapshot": "2023-06-02"
+        }
+    ]
+}
+############################################################################################
+
