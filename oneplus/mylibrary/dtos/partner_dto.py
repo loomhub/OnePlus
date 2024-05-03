@@ -2,8 +2,8 @@ from datetime import date
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
-class vendorDTO(BaseModel):
-    vendor : Optional[str] = None
+class partnerDTO(BaseModel):
+    partner : Optional[str] = None
     recipient_type : Optional[str] = None
     recipient_tin_type : Optional[str] = None
     recipient_tin : Optional[str] = None
@@ -17,9 +17,9 @@ class vendorDTO(BaseModel):
     class Config:
         orm_mode = True
     
-class vendorFullDTO(BaseModel):
+class partnerFullDTO(BaseModel):
     id : Optional[int] = None
-    vendor : Optional[str] = None
+    partner : Optional[str] = None
     recipient_type : Optional[str] = None
     recipient_tin_type : Optional[str] = None
     recipient_tin : Optional[str] = None
@@ -33,33 +33,33 @@ class vendorFullDTO(BaseModel):
     class Config:
         orm_mode = True
 
-class vendorsListDTO(BaseModel):
-    vendors: List[vendorDTO]
+class partnersListDTO(BaseModel):
+    partners: List[partnerDTO]
 
-class vendorsFullListDTO(BaseModel):
-    vendors: List[vendorFullDTO]
+class partnersFullListDTO(BaseModel):
+    partners: List[partnerFullDTO]
 
-class vendorDelDTO(BaseModel):
-    vendor : Optional[str] = None
+class partnerDelDTO(BaseModel):
+    partner : Optional[str] = None
 
-class vendorsDelListDTO(BaseModel):
-    vendorsDel: List[vendorDelDTO]
+class partnersDelListDTO(BaseModel):
+    partnersDel: List[partnerDelDTO]
 
-class vendorQueryParams(BaseModel):
-    vendor: Optional[str] = Field(None, description="Name of the vendor to filter by")
+class partnerQueryParams(BaseModel):
+    partner: Optional[str] = Field(None, description="Name of the partner to filter by")
     
-class vendorQueryPrimaryKey(BaseModel):
-    vendor: Optional[str] = Field(None, description="Name of the LLC to filter by")
+class partnerQueryPrimaryKey(BaseModel):
+    partner: Optional[str] = Field(None, description="Name of the LLC to filter by")
 
-class vendorQueryEmail(BaseModel):
+class partnerQueryEmail(BaseModel):
     receiver: Optional[str] = Field(None, description="Name of the email receiver")
 
-class vendorQueryUpdateFlag(BaseModel):
+class partnerQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 
 
 VENDOR_COLUMNS = {
-    'Vendor': 'vendor',
+    'Vendor': 'partner',
     'Recipient Type': 'recipient_type',
     'Recipient TIN Type': 'recipient_tin_type',
     'Recipent TIN': 'recipient_tin',

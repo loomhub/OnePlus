@@ -1,25 +1,25 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.vendor_dto import vendorQueryEmail, vendorQueryPrimaryKey, vendorQueryUpdateFlag,vendorsListDTO, vendorsDelListDTO, vendorDTO
+from ..dtos.partner_dto import partnerQueryEmail, partnerQueryPrimaryKey, partnerQueryUpdateFlag,partnersListDTO, partnersDelListDTO, partnerDTO
 from ..database.db import get_session
-from ..repositories.vendor_repository import vendorRepository
-from ..services.vendor_service import vendorService
-from ..services.vendor_filehandler import vendorFileHandler
-from ..models.vendors_model import vendorsModel
+from ..repositories.partner_repository import partnerRepository
+from ..services.partner_service import partnerService
+from ..services.partner_filehandler import partnerFileHandler
+from ..models.partners_model import partnersModel
 import logging
 
 # DEFINITIONS
-get_pkey="/vendors/pkey"
-get_all=post_all="/vendors"
-send_vendor_report="/vendors/email"
-del_all = "/vendorsdel"
-excel_upload = "/vendorsxl"
-myObjects="vendors"
-get_response_model=vendorsListDTO
-get_pkey_model = vendorDTO
-del_response_model=vendorsDelListDTO
-myModel=vendorsModel
+get_pkey="/partners/pkey"
+get_all=post_all="/partners"
+send_partner_report="/partners/email"
+del_all = "/partnersdel"
+excel_upload = "/partnersxl"
+myObjects="partners"
+get_response_model=partnersListDTO
+get_pkey_model = partnerDTO
+del_response_model=partnersDelListDTO
+myModel=partnersModel
 
 router = APIRouter()
 
@@ -34,8 +34,8 @@ router = APIRouter()
         )
 
 async def get_all_records(db: AsyncSession = Depends(get_session)):
-    my_repository = vendorRepository(db)
-    my_service = vendorService(my_repository)
+    my_repository = partnerRepository(db)
+    my_service = partnerService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
     except Exception as e:
@@ -44,20 +44,20 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
 
 ############################################################################################################
 @router.get(
-        send_vendor_report,
-        summary="Send vendor report to email",
-        description="Send vendor report to email",
+        send_partner_report,
+        summary="Send partner report to email",
+        description="Send partner report to email",
         status_code=200,
         response_model=get_response_model,
         tags=["Get"],
         )
 
-async def send_vendor_report(
-     query_params: vendorQueryEmail = Depends(),
+async def send_partner_report(
+     query_params: partnerQueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = vendorRepository(db)
-    my_service = vendorService(my_repository)
+    my_repository = partnerRepository(db)
+    my_service = partnerService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
         sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
@@ -78,13 +78,13 @@ async def send_vendor_report(
         )
 
 async def get_record_by_pkey(
-    query_params: vendorQueryPrimaryKey = Depends(),
+    query_params: partnerQueryPrimaryKey = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = vendorRepository(db)
-    my_service = vendorService(my_repository)
+    my_repository = partnerRepository(db)
+    my_service = partnerService(my_repository)
     try:
-        key_fields = {'vendor': query_params.vendor}  # Adjust according to actual key fields
+        key_fields = {'partner': query_params.partner}  # Adjust according to actual key fields
         result = await my_service.extract_pkey(myModel,key_fields)
         if result is None:
             return {}
@@ -101,15 +101,15 @@ async def get_record_by_pkey(
         )
 async def create_or_update_data(
      input_data: get_response_model, 
-     query_params: vendorQueryUpdateFlag = Depends(),
+     query_params: partnerQueryUpdateFlag = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = vendorRepository(db)
-    my_service = vendorService(my_repository)
+    my_repository = partnerRepository(db)
+    my_service = partnerService(my_repository)
     results = []
-    for record in input_data.vendors:
+    for record in input_data.partners:
         try:
-            key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
+            key_fields = {'partner': record.partner}  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
@@ -118,22 +118,22 @@ async def create_or_update_data(
     return results
 ############################################################################################################
 
-@router.post(excel_upload, summary="Upload and save vendors data from a CSV file")
+@router.post(excel_upload, summary="Upload and save partners data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
-    query_params: vendorQueryUpdateFlag = Depends(),
+    query_params: partnerQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    my_filehandler = vendorFileHandler(file)
+    my_filehandler = partnerFileHandler(file)
     input_data = my_filehandler.extract_data_from_file()
 
-    my_repository = vendorRepository(db)
-    my_service = vendorService(my_repository)
+    my_repository = partnerRepository(db)
+    my_service = partnerService(my_repository)
     results = []
-    for record in input_data.vendors:
+    for record in input_data.partners:
         try:
-            key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
+            key_fields = {'partner': record.partner}  # Adjust according to actual key fields
             created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
             results.append( {"created": created, myObjects: result} )
         except Exception as e:
@@ -150,12 +150,12 @@ async def upload_and_upsert_records(
         tags=["Delete"],
         )
 async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = vendorRepository(db)
-    my_service = vendorService(my_repository)
+    my_repository = partnerRepository(db)
+    my_service = partnerService(my_repository)
     results = []
-    for record in input_data.vendorsDel:   
+    for record in input_data.partnersDel:   
         try:
-            key_fields = {'vendor': record.vendor}  # Adjust according to actual key fields
+            key_fields = {'partner': record.partner}  # Adjust according to actual key fields
             deleted,result = await my_service.delete_records(record, myModel, key_fields)
             results.append( {"deleted": deleted,myObjects: result} )
         except Exception as e:

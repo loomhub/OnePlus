@@ -2,11 +2,11 @@ from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, U
 from ..database.db import Base
 from sqlalchemy.orm import relationship
 
-class vendorsModel(Base):
-    __tablename__ = "vendors"
+class partnersModel(Base):
+    __tablename__ = "partners"
 
     id = Column(Integer, primary_key=True, index=True)
-    vendor = Column(String, index=True, nullable=False,unique = True)
+    partner = Column(String, index=True, nullable=False,unique = True)
     recipient_type = Column(String,CheckConstraint('recipient_type IN ("Individual","Business")'))
     recipient_tin_type = Column(String,CheckConstraint('recipient_tin_type IN ("SSN","EIN")'))
     recipient_tin = Column(String)
@@ -18,6 +18,6 @@ class vendorsModel(Base):
     zip_code = Column(String)
     country = Column(String)
     __table_args__ = (
-        UniqueConstraint('vendor', name='uix_vendor'),
+        UniqueConstraint('partner', name='uix_partner'),
     )
     

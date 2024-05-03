@@ -3,33 +3,33 @@
 @var1=value1 
 
 # @name get_transaction
-GET {{hostName}}/vendors/email?receiver=vivekjadhav@yahoo.com
+GET {{hostName}}/partners/email?receiver=vivekjadhav@yahoo.com
 Content-Type: application/json
 
 ############################################################################################
 # @name get_transaction
-GET {{hostName}}/vendors
+GET {{hostName}}/partners
 Content-Type: application/json
 ############################################################################################
 # @name get_transaction
-GET {{hostName}}/search/vendors?vendor=Y&start_date=1990-12-31
+GET {{hostName}}/search/partners?partner=Y&start_date=1990-12-31
 Content-Type: application/json
 
 ############################################################################################
-GET {{hostName}}/vendors/pkey?vendor=W9-CCC_SERVICES
+GET {{hostName}}/partners/pkey?partner=W9-CCC_SERVICES
 Content-Type: application/json    
 
 
 ############################################################################################
 # @name post_transactions
-POST {{hostName}}/vendors
+POST {{hostName}}/partners
 Content-Type: application/json
 
 
 {
-    "vendors": [
+    "partners": [
         {
-            "vendor" : "NA",
+            "partner" : "NA",
             "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
             "recipient_tin" : "99-999-999",
@@ -42,7 +42,7 @@ Content-Type: application/json
             "country" : "USA"
         },
         {
-            "vendor" : "W9-BBB_SERVICES",
+            "partner" : "W9-BBB_SERVICES",
             "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
             "recipient_tin" : "99-3999953",
@@ -55,7 +55,7 @@ Content-Type: application/json
             "country" : "USA"
         },
         {
-            "vendor" : "W9-CCC_SERVICES",
+            "partner" : "W9-CCC_SERVICES",
             "recipient_type" : "Business",
             "recipient_tin_type" : "EIN",
             "recipient_tin" : "99-3999953",
@@ -71,21 +71,21 @@ Content-Type: application/json
 }
 
 ############################################################################################
-# @name delete_vendors
-DELETE {{hostName}}/vendorsdel
+# @name delete_partners
+DELETE {{hostName}}/partnersdel
 Content-Type: application/json
 
 
 {
-    "vendorsDel": [
+    "partnersDel": [
         {
-            "vendor": "W9-AAA_SERVICES"
+            "partner": "W9-AAA_SERVICES"
         },
         {
-            "vendor": "W9-BBB_SERVICES"
+            "partner": "W9-BBB_SERVICES"
         },
         {
-            "vendor": "W9-AAA_SERVIC"
+            "partner": "W9-AAA_SERVIC"
         }
     ]
 }
