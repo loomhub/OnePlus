@@ -5,16 +5,14 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import BytesIO
 import smtplib
-from typing import BinaryIO, Optional, Tuple, Type, TypeVar
+from typing import BinaryIO, List, Optional, Tuple, Type, TypeVar,Dict
 import pandas as pd
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
-
 from ..models.emailConfig_model import emailsConfigModel
 from ..models.birds_model import birdsModel
 from ..repositories.myrepository import myRepository  # Assuming a base repository exists
-# Define a type variable that can be any subclass of BaseModel
-DTO = TypeVar('DTO', bound=BaseModel)
+DTO = TypeVar('DTO', bound=BaseModel) # Define a type variable that can be any subclass of BaseModel
 
 
 class MyService:
@@ -110,6 +108,18 @@ class MyService:
                # Handle specific database errors or re-raise
                await self.repository.rollback_changes()
                raise Exception(f"Database error: {str(e)}")
+    
+    ############################################################################################################    
+    async def validate_data(self, records:List[Type[BaseModel]], fkey_checks: Dict[Type[BaseModel], str]) -> List[str]:
+        errors = []
+        for record in records:
+            for model, field_mappings in fkey_checks.items():
+                filters = {model_field: getattr(record, record_field) for record_field, model_field in field_mappings.items()}
+                record_exists = await self.repository.retrieve_unique_record(model, filters)
+                if not record_exists:
+                    errors.append(f"Foreign key validation failed for {filters} in {model.__tablename__}")
+        return errors
+
     ############################################################################################################
     def set_email_addresses(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel) -> EmailMessage:
         """

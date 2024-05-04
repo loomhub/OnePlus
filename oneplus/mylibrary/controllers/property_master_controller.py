@@ -7,6 +7,8 @@ from ..repositories.property_master_repository import propertyMasterRepository
 from ..services.property_master_service import propertyMasterService
 from ..services.property_master_filehandler import propertyMasterFileHandler
 from ..models.property_master_model import propertyMastersModel
+from ..models.llcs_model import llcsModel
+
 import logging
 
 # DEFINITIONS
@@ -103,18 +105,16 @@ async def create_or_update_data(
      input_data: get_response_model,
      query_params: propertyMasterQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)):
+
     my_repository = propertyMasterRepository(db)
     my_service = propertyMasterService(my_repository)
-    results = []
-    for record in input_data.propertyMasters:
-        try:
-            key_fields = {'property_name': record.property_name}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
+
+    resultsList,errorsList = await my_service.post_data(input_data.propertyMasters, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
+    
 ############################################################################################################
 
 @router.post(excel_upload, summary="Upload and save propertyMasters data from a CSV file")
@@ -124,22 +124,20 @@ async def upload_and_upsert_records(
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    my_filehandler = propertyMasterFileHandler(file)
-    input_data = my_filehandler.extract_data_from_file()
-
     my_repository = propertyMasterRepository(db)
     my_service = propertyMasterService(my_repository)
-    results = []
-    for record in input_data.propertyMasters:
-        try:
-            key_fields = {'property_name': record.property_name}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
+
+    my_filehandler = propertyMasterFileHandler(file)
+    input_data, errorsList = my_filehandler.extract_data_from_file()
     
+    if errorsList:
+        return errorsList
+
+    resultsList,errorsList = await my_service.post_data(input_data.propertyMasters, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
 ############################################################################################################
 
 @router.delete(

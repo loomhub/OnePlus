@@ -29,26 +29,20 @@ Content-Type: application/json
 {
     "bankaccounts": [
         {
-            "bank_account_key": "108Meadow",
+            "bank_account_key": "2224Heatherton",
             "bank": "Wells Fargo",
             "account_type": "Checking",
             "account_number": "999999999",
-            "llc": "MDW"
+            "llc": "MDW",
+            "property_name": "2224Heatherton"
         },
         {
-            "bank_account_key": "104Meadow",
+            "bank_account_key": "4920BrianHill",
             "bank": "Wells Fargo",
             "account_type": "Checking",
             "account_number": "2123710218",
             "llc": "MDW",
-            "property_name": "104Meadow"
-        },
-        {
-            "bank_account_key": "Dummy",
-            "bank": "Chase",
-            "account_type": "Checking",
-            "account_number": "Dummy",
-            "llc": "PAG"
+            "property_name": "14920BrianHill"
         }
     ]
 }

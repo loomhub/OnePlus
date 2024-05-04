@@ -1,9 +1,11 @@
 from datetime import datetime
 import os, shutil
-from typing import List, Type
+from typing import List, Tuple, Type
 from fastapi import HTTPException
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
+
+from ..services.myservice import MyService
 from ..dtos.llc_dto import LLC_COLUMNS, llcsListDTO, llcDTO
 
 
@@ -40,27 +42,24 @@ class myFileHandler:
             self,
             df: pd.DataFrame, #pandas.DataFrame containing the data.
             dto_class: Type[BaseModel] #The DTO class to which rows will be converted.
-            )  -> List[BaseModel]: #Return a list of DTO instances.
+            )  -> Tuple[List[BaseModel],List[str]]: #Return a list of DTO instances.
     
-        dto_list = []
+        # errorsList=dto_list = []
+        # for index, row in df.iterrows():
+        #     for column, value in row.items():
+        #             if pd.isna(value):
+        #                 errorsList.append(f"Column causing issue: {column}, Value: {value} in row {row}")
+        # if len(errorsList)==0:
+        dto_list=[]
         for index, row in df.iterrows():
             try:
-        # Use dictionary unpacking to initialize the DTO from a row.
-                dto_instance = dto_class(**row.to_dict())
+                dto_instance = dto_class(**row.to_dict()) # Use dictionary unpacking to initialize the DTO from a row.
                 dto_list.append(dto_instance)
-            except:
+            except ValidationError as e:
                 print(f"Error occurred at row index {index}")
-                for column, value in row.items():
-                    try:
-                        # Attempt to pass each column's value to a dummy function of the class that mimics the constructor's behavior
-                        test_instance = dto_class(**{column: value})
-                    except TypeError:
-                        # Identify and print the problematic column and its value
-                        print(f"Column causing issue: {column}, Value: {value}, Expected type: int")
-                        break  # Break out of the inner loop after finding the first problematic column
-
+                
         print(type(dto_list))   
-    
+
         return dto_list
 #############################################################################################################
     def convert_columns_to_date(self, 
@@ -150,4 +149,16 @@ class myFileHandler:
             df.drop(columns=columns_to_remove, inplace=True)
             return df
 #############################################################################################################
-        
+
+    def validate_null(self,df: pd.DataFrame) -> List[str]:
+    # Create a mask that is True wherever there are NaNs
+        mask = df.isna().any(axis=1)
+    
+    # Use the mask to select all rows that have any NaN values
+        errorDf = df[mask]
+        errorsList = errorDf.to_dict(orient='records')
+        if len(errorsList)>0:
+            return {'errors':errorsList}
+        else:
+            return {}
+############################################################################################################

@@ -1,6 +1,6 @@
 ﻿Bank Key,Bank,AccountType,ExternalAccount,LLC,Property
-MeadowSecurity,Wells Fargo,Checking,1160333314,MDW,
-TrustAccount,Wells Fargo,Savings,1766076424,MDW,
+MeadowSecurity,Wells Fargo,Checking,1160333314,MDW,NVPartnership
+TrustAccount,Wells Fargo,Savings,1766076424,MDW,NVPartnership
 1905Morning,Wells Fargo,Checking,2120678228,MDW,1905Morning
 2417Garden,Wells Fargo,Savings,5123943606,MDW,2417Garden
 108Pagoda,Wells Fargo,Checking,2123674356,PAG,108Pagoda
@@ -12,25 +12,25 @@ TrustAccount,Wells Fargo,Savings,1766076424,MDW,
 1342Newton,Wells Fargo,Checking,3123752192,PAG,1342Newton
 1316Rosemon,Wells Fargo,Checking,3123788147,PAG,1316Rosemon
 874Wintergreen,Wells Fargo,Checking,8320478665,PAG,874Wintergreen
-PagodaSecurity,Wells Fargo,Savings,1124223312,PAG,
+PagodaSecurity,Wells Fargo,Savings,1124223312,PAG,NVPartnership
 711Parks,Wells Fargo,Checking,3123859963,PAG,711Parks
 Midway,Wells Fargo,Checking,5445996969,MID,Midway
 1117Brewer,Wells Fargo,Checking,8320442620,MDW,1117Brewer
-Partnership,Wells Fargo,Savings,2113481242,NV,
+Partnership,Wells Fargo,Savings,2113481242,NV,NVPartnership
 8604Wagon,Chase,Checking,710665618,MDW,8604Wagon
 114Sidney,Chase,Checking,371052603,MDW,114Sidney
 2224Heatherton,Chase,Checking,678827616,MDW,2224Heatherton
-4920BrianHill,Chase,Checking,692554576,MDW,4920BrianHill
-Common,Chase,Checking,710655031,NV,
+4920Brianhill,Chase,Checking,692554576,MDW,4920Brianhill
+Common,Chase,Checking,710655031,NV,NVPartnership
 6401Basswood,Chase,Checking,886965909,PAG,6401Basswood
 4909Jamesway,Chase,Checking,886968291,PAG,4909Jamesway
 7417Canoga,Chase,Checking,363876571,PAG,7417Canoga
-TrustChase,Chase,Savings,788709670,MDW,
-108PagodaSavings,Chase,Savings,0,PAG,108Pagoda
-2708Mountain,Chase,Checking,0,PAG,2708Mountain
-2615Dewitt,Chase,Checking,0,PAG,2615Dewitt
-1905MorningSavings,Chase,Savings,0,MDW,1905Morning
-3113Willow,Chase,Checking,0,PAG,3113Willow
-1413Rockbrook,Chase,Checking,0,PAG,1413Rockbrook
-4445Cranwood,Chase,Checking,0,PAG,4445Cranwood
-MedViewSD,Chase,Savings,5798,MDW,
+TrustChase,Chase,Savings,788709670,MDW,NVPartnership
+108PagodaSavings,Chase,Savings,Inactive,PAG,108Pagoda
+2708Mountain,Chase,Checking,Inactive,PAG,2708Mountain
+2615Dewitt,Chase,Checking,Inactive,PAG,2615Dewitt
+1905MorningSavings,Chase,Savings,Inactive,MDW,1905Morning
+3113Willow,Chase,Checking,Inactive,PAG,3113Willow
+1413Rockbrook,Chase,Checking,Inactive,PAG,1413Rockbrook
+4445Cranwood,Chase,Checking,Inactive,PAG,4445Cranwood
+MedViewSD,Chase,Savings,5798,MDW,NVPartnership

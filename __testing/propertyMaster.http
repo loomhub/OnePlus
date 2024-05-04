@@ -16,7 +16,7 @@ GET {{hostName}}/search/propertyMasters?propertyMaster_name=Y&start_date=1990-12
 Content-Type: application/json
 
 ############################################################################################
-GET {{hostName}}/propertyMasters/pkey?property_name=104Meadow
+GET {{hostName}}/propertyMasters/pkey?property_name=2224Heatherton
 Content-Type: application/json    
 
 
@@ -29,12 +29,14 @@ Content-Type: application/json
 {
     "propertyMasters": [
         {
-            "property_name": "104Meadow",
-            "property_description": "104 Meadow View Lane Anna TX 75409",
-            "llc": "MDW",
-            "note": "VJ",
-            "purchase_date": "2013-10-29",
-            "purchase_price": 122197,
+            "property_name": "2224Heatherton",
+            "property_description": "2224 Heatherton Place Plano TX 75023",
+            "llc": "PAG",
+            "note": "LLC",
+            "purchase_date": "2020-05-05",
+            "sell_date": "2021-04-20",
+            "purchase_price": 198000,
+            "sell_price": 290000,
             "units": 1,
             "county": "Collin"
     }
