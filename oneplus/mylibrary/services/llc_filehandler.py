@@ -11,8 +11,12 @@ class llcFileHandler(myFileHandler):
         df = self.read_data()
         df.rename(columns=LLC_COLUMNS, inplace=True)
         df=self.convert_columns_to_date(df, ['formation_date'])
+        errorsList = self.validate_null(df)
         try:
-            llcs_data = self.convert_dataframe_to_list_dto(df,llcDTO)
-            return llcsListDTO(llcs=llcs_data)
+            if errorsList:
+                return {},errorsList
+            else:
+                llcs_data = self.convert_dataframe_to_list_dto(df,llcDTO)
+                return llcsListDTO(llcs=llcs_data),[]
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")

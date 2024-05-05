@@ -5,10 +5,15 @@ class emailsConfigModel(Base):
     __tablename__ = "emails_config"
 
     id = Column(Integer, primary_key=True, index=True)
-    subject = Column(String, index=True, nullable=False,unique = True)
-    endpoint = Column(String,index=True, nullable=False,unique = True)
-    to = Column(String,index=True, nullable=False,unique = True) 
+    subject = Column(String, index=True, nullable=False)
+    endpoint = Column(String,index=True, nullable=False)
+    to = Column(String,index=True, nullable=False) 
     cc = Column(String)  
     bcc = Column(String) 
-    inactive = Column(String,nullable=False,unique = True)  
+    active = Column(String,nullable=False)  
+    # Define the composite unique constraint
+    __table_args__ = (
+        UniqueConstraint('subject', 'endpoint', 'to', 'cc', 'bcc',
+                         name='uix_email_config_subject_endpoint'),
+    )
     

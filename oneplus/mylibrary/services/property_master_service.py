@@ -16,7 +16,8 @@ class propertyMasterService(MyService):
                         model: Type[BaseModel], 
                         update_flag:str,myObjects:str):
         
-        results=errors=[]
+        results=[]
+        errors=[]
 
         # Validate data
         fkey_checks = {llcsModel: {'llc': 'llc'}}  # Fkey Model: {input data column: Model column}} 

@@ -1,6 +1,5 @@
 import logging
 from typing import List, Type
-
 from fastapi import HTTPException
 from pydantic import BaseModel
 
@@ -8,7 +7,7 @@ from ..models.llcs_model import llcsModel
 from ..models.property_master_model import propertyMastersModel
 from ..repositories.bankaccount_repository import bankaccountRepository
 from .myservice import MyService
-from .myservice import MyService
+
 
 class bankaccountService(MyService):
     def __init__(self, bankaccount_repository: bankaccountRepository):
@@ -19,7 +18,8 @@ class bankaccountService(MyService):
                         model: Type[BaseModel], 
                         update_flag:str,myObjects:str):
         
-        results=errors=[]
+        results=[]
+        errors=[]
 
         # Validate data
         fkey_checks = {llcsModel: {'llc': 'llc'}, propertyMastersModel: {'property_name':'property_name'}}  # Fkey Model: {input data column: Model column}} 

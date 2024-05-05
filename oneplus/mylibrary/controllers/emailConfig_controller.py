@@ -74,47 +74,42 @@ async def get_record_by_pkey(
         tags=["Upsert"],
         )
 async def create_or_update_data(
-    input_data: get_response_model, 
-    query_params: emailConfigQueryUpdateFlag = Depends(),
-    db: AsyncSession = Depends(get_session)
-    ):
+     input_data: get_response_model,
+     query_params: emailConfigQueryUpdateFlag = Depends(),
+    db: AsyncSession = Depends(get_session)):
+
     my_repository = emailConfigRepository(db)
     my_service = emailConfigService(my_repository)
-    results = []
-    for record in input_data.emailsConfig:
-        try:
-            key_fields = {'subject': record.subject}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
+
+    resultsList,errorsList = await my_service.post_data(input_data.emailsConfig, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
+    
 ############################################################################################################
 
-@router.post(excel_upload, summary="Upload and save emailsConfig data from a CSV file")
+@router.post(excel_upload, summary="Upload and save emailConfigs data from a CSV file")
 async def upload_and_upsert_records(
     file: UploadFile = File(...),
     query_params: emailConfigQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
     
-    my_filehandler = emailConfigFileHandler(file)
-    input_data = my_filehandler.extract_data_from_file()
-
     my_repository = emailConfigRepository(db)
     my_service = emailConfigService(my_repository)
-    results = []
-    for record in input_data.emailsConfig:
-        try:
-            key_fields = {'subject': record.subject,'to': record.to,'cc': record.cc,'bcc': record.bcc}  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
+
+    my_filehandler = emailConfigFileHandler(file)
+    input_data, errorsList = my_filehandler.extract_data_from_file()
     
+    if errorsList:
+        return errorsList
+
+    resultsList,errorsList = await my_service.post_data(input_data.emailsConfig, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
 ############################################################################################################
 
 @router.delete(

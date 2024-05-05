@@ -47,9 +47,9 @@ class llcQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 
 LLC_COLUMNS = {
-    'LLC': 'llc',
-    'EIN': 'ein',
-    'Address': 'llc_address',
-    'Description': 'llc_description',
-    'FormationDate': 'formation_date'
+    'llc': 'llc',
+    'ein': 'ein',
+    'llc_adddress': 'llc_address',
+    'llc_description': 'llc_description',
+    'formation_date': 'formation_date'
 }    

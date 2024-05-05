@@ -13,8 +13,13 @@ class tenantFileHandler(myFileHandler):
         df=self.convert_columns_to_date(df, ['lease_start','lease_end'])
         df=self.convert_columns_to_numeric(df, ['rent','security_deposit'])
         df=self.convert_columns_to_string(df, ['unit_name'], na_values='NA')
+        errorsList = self.validate_null(df)
+        
         try:
-            tenants_data = self.convert_dataframe_to_list_dto(df,tenantDTO)
-            return tenantsListDTO(tenants=tenants_data)
+            if errorsList:
+                return {},errorsList
+            else:
+                tenants_data = self.convert_dataframe_to_list_dto(df,tenantDTO)
+                return tenantsListDTO(tenants=tenants_data)
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")

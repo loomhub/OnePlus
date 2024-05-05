@@ -11,8 +11,13 @@ class transactionTypeFileHandler(myFileHandler):
         df = self.read_data()
         df.rename(columns=TRANSACTION_TYPES_COLUMNS, inplace=True)
         df=self.convert_columns_to_string(df, ['transaction_group','transaction_type','transaction_description'])
+        errorsList = self.validate_null(df)
+        
         try:
-            transactionTypes_data = self.convert_dataframe_to_list_dto(df,transactionTypeDTO)
-            return transactionTypesListDTO(transactionTypes=transactionTypes_data)
+            if errorsList:
+                return {},errorsList
+            else:
+                transactionTypes_data = self.convert_dataframe_to_list_dto(df,transactionTypeDTO)
+                return transactionTypesListDTO(transactionTypes=transactionTypes_data),[]
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")

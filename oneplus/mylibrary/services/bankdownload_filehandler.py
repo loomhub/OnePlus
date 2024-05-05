@@ -25,9 +25,14 @@ class bankdownloadFileHandler(myFileHandler):
         df=self.convert_columns_to_string(df, ['bank_account_key','description'])
         df=self.convert_columns_to_numeric(df, ['amount'])
         df=self.convert_columns_to_date(df, ['tdate'])
+        errorsList = self.validate_null(df)
+        
         try:
-            bankdownloads_data = self.convert_dataframe_to_list_dto(df,bankdownloadDTO)
-            return bankdownloadsListDTO(bankdownloads=bankdownloads_data)
+            if errorsList:
+                return {},errorsList
+            else:
+                bankdownloads_data = self.convert_dataframe_to_list_dto(df,bankdownloadDTO)
+                return bankdownloadsListDTO(bankdownloads=bankdownloads_data)
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")
         

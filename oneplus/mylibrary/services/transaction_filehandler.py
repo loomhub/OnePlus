@@ -16,9 +16,14 @@ class transactionFileHandler(myFileHandler):
         df=self.convert_columns_to_string(df, ['vendor','customer'], na_values='NA')
         df=self.convert_columns_to_date(df, ['tdate'])
         df=self.convert_columns_to_numeric(df, ['amount'])
+        errorsList = self.validate_null(df)
+        
         try:
-            transactions_data = self.convert_dataframe_to_list_dto(df,transactionDTO)
-            return transactionsListDTO(transactions=transactions_data)
+            if errorsList:
+                return {},errorsList
+            else:
+                transactions_data = self.convert_dataframe_to_list_dto(df,transactionDTO)
+                return transactionsListDTO(transactions=transactions_data),[]
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")
    

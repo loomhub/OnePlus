@@ -31,23 +31,9 @@ Content-Type: application/json
         {
             "llc": "NV",
             "ein": "Neeraj Vivek",
-            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034 CHIV",
+            "llc_address": "8700 STONEBROOK PKWY UNIT 2758 FRISCO, TX 75034",
             "llc_description": "Neeraj Vivek Partnership",
             "formation_date": "2013-10-01"
-        },
-        {
-            "llc": "GOL",
-            "ein": "87-1462999 VIV",
-            "llc_address": "8700 TEST PKWY UNIT 2758 FRISCO, TX 75034 VIV",
-            "llc_description": "TEST INN LLC VIV",
-            "formation_date": "2022-06-29"
-        },
-        {
-            "llc": "YYY",
-            "ein": "87-1462999 PPP",
-            "llc_address": "XXX TEST PKWY UNIT 2758 FRISCO, TX 75034 PPP",
-            "llc_description": "XXXTEST INN LLC PPP",
-            "formation_date": "2019-06-29"
         }
     ]
 }
