@@ -59,7 +59,7 @@ class partnerQueryUpdateFlag(BaseModel):
 
 
 VENDOR_COLUMNS = {
-    'Vendor': 'partner',
+    'Partner': 'partner',
     'Recipient Type': 'recipient_type',
     'Recipient TIN Type': 'recipient_tin_type',
     'Recipent TIN': 'recipient_tin',

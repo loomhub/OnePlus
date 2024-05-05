@@ -86,6 +86,7 @@ class myFileHandler:
             for column_name in column_names:
                 if column_name in df.columns:
                     try:
+                        df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
                         df[column_name] = pd.to_datetime(df[column_name]).dt.date
                         df[column_name] = pd.to_datetime(df[column_name]).dt.to_period('M').dt.to_timestamp()
                     except Exception as e:
@@ -115,7 +116,10 @@ class myFileHandler:
             if column_name in df.columns:
                 try:
                     df[column_name] = df[column_name].fillna(0).astype(str)
-                    df[column_name] = df[column_name].str.replace(',', '').str.replace('$', '').str.replace('(', '-').str.replace(')', '')
+                    df[column_name] = df[column_name].str.replace(',', '').str.replace('$', '')
+                    df[column_name] = df[column_name].str.replace('(', '-').str.replace(')', '')
+                    # Handle the case where "-" should be converted to 0, but not affect numbers like "-90"
+                    df[column_name] = df[column_name].apply(lambda x: '0' if x.strip() == '-' else x)
                     #df[column_name] = df[column_name].str.replace(r'\((\d+)\)', r'-\1', regex=True).astype(float)
                     df[column_name] = pd.to_numeric(df[column_name], errors='coerce')   
                 except Exception as e:

@@ -21,8 +21,8 @@ class partnerService(MyService):
         errors=[]
 
         # Validate data
-        validate_key= {'receipient_type': ('Individual','Business'), 'recipient_tin_type': ('SSN','EIN')}
-        errors = await self.validate_value_contraints(records, validate_key)
+        validate_key= {'recipient_type': ('Individual','Business'), 'recipient_tin_type': ('SSN','EIN')}
+        errors = await self.validate_value_constraints(records, validate_key)
 
         # Post data if no errors
         if not errors:

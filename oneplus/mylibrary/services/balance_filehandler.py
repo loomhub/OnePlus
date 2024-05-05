@@ -11,7 +11,8 @@ class balanceFileHandler(myFileHandler):
         df = self.read_data()
         df.rename(columns=BALANCES_COLUMNS, inplace=True)
         df=self.convert_columns_to_string(df, ['bank_account_key'])
-        df=self.convert_columns_to_date(df, ['snapshot'])
+       # df=self.convert_columns_to_date(df, ['snapshot'])
+        df=self.convert_month_to_date(df, ['snapshot'])
         df=self.convert_columns_to_numeric(df, ['balance'])
         errorsList = self.validate_null(df)
         

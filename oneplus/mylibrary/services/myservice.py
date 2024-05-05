@@ -121,13 +121,15 @@ class MyService:
         return errors
 
     ############################################################################################################
-    async def validate_value_constraints(records: List[Dict], validate_keys: Dict[str, Tuple]) -> List[str]:
+    async def validate_value_constraints(self,records:List[Type[BaseModel]], validate_keys: Dict[str, Tuple]) -> List[str]:
         errors = []
         for index, record in enumerate(records):
             for key, valid_values in validate_keys.items():
-                if key in record:
-                    if record[key] not in valid_values:
-                        errors.append(f"Record {index} error: {key}='{record[key]}' is not one of {valid_values}")
+                # Using hasattr and getattr to handle attributes in BaseModel-derived classes.
+                if hasattr(record, key):
+                    value = getattr(record, key)
+                    if value not in valid_values:
+                        errors.append(f"Record {index} error: {key}='{value}' is not one of {valid_values}")
                 else:
                     errors.append(f"Record {index} error: {key} is missing from the record")
         return errors
