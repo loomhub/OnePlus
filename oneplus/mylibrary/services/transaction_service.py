@@ -43,7 +43,7 @@ class transactionService(MyService):
         errors=[]
 
         # Validate data
-        fkey_checks = {bankaccountsModel: {'bankaccount_key': 'bank_account_key'},
+        fkey_checks = {bankaccountsModel: {'bank_account_key': 'bank_account_key'},
                        transactionTypesModel: {'transaction_group': 'transaction_group',
                                                'transaction_type': 'transaction_type'},
                         partnersModel: {'vendor':'partner'},

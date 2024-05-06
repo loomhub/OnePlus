@@ -1,23 +1,25 @@
-﻿Transaction Group,Transaction Type
-A01 - Revenue,Rev-Interest
-A01 - Revenue,Rev-Rent
-A02 - Expense,Exp-Allocation
-A02 - Expense,Exp-Cleaning
-A02 - Expense,Exp-HOA
-A02 - Expense,Exp-Insurance
-A02 - Expense,Exp-Mgmt
-A02 - Expense,Exp-Mortgage
-A02 - Expense,Exp-Professional Services
-A02 - Expense,Exp-Repair
-A02 - Expense,Exp-Travel
-A02 - Expense,Exp-Taxes
-A02 - Expense,Exp-Utilities
-A03 - Capex,Capex-Acquisition
-A03 - Capex,Capex-Install
-A03 - Capex,Capex-Mgmt
-A05 - Bank Transfer,Transfer-Checking
-A05 - Bank Transfer,Transfer-Savings
-A06 - Funding,Owner-Funding
-A07 - Security Deposit,Liab-Security
-A08 - Owners Draw,Owners-Draw
-A09 - Owners Withdrawal,Owners-Withdrawal
+﻿Transaction Group,Transaction Type,Description
+A01-Income,Exp-Allocation,Allocation expense
+A01-Income,Exp-Cleaning,Cleaning expense
+A01-Income,Exp-HOA,HOA expense
+A01-Income,Exp-Insurance,Insurance expense
+A01-Income,Exp-Mgmt,Mgmt expense
+A01-Income,Exp-Mortgage,Mortgage expense
+A01-Income,Exp-ProfessionalServices,Professional Services
+A01-Income,Exp-Repair,Repair expense
+A01-Income,Exp-Taxes,Taxes expense
+A01-Income,Exp-Travel,Travel expense
+A01-Income,Exp-Utilities,Utilities expense
+A01-Income,Rev-Interest,Revenue interest
+A01-Income,Rev-Rent,Revenue rent
+B01-SecurityDeposit,Security-Expense,Security used for repairs
+B01-SecurityDeposit,Security-In,Security received
+B01-SecurityDeposit,Security-Refund,Security returned to tenant
+C01-Capex,Capex-Acquisition,Asset purchase
+C01-Capex,Capex-Install,Asset rehab
+C01-Capex,Capex-Refi,Asset refinanced
+C01-Capex,Capex-Sell,Asset sale
+D01-Owner,Owner-Draw,Owner withdrawal
+D01-Owner,Owner-Funding,Owner funding
+E01-Transfer,Balancing-Transaction,Balancing transaction
+F01-BankTransfer,Transfer,Bank transfer

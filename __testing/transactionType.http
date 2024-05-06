@@ -29,9 +29,9 @@ Content-Type: application/json
 {
     "transactionTypes": [
         {
-            "transaction_group": "A01-Revenue",
-            "transaction_type": "Rev-Interest",
-            "transaction_description" : "Interest Revenue"
+            "transaction_group": ""A02-Expense"",
+            "transaction_type": ""Exp-Repair"",
+            "transaction_description" : "Repair Expense"
         },
         {
             "transaction_group": "A01-Revenue",
@@ -55,16 +55,20 @@ Content-Type: application/json
 {
     "transactionTypesDel": [
         {
-            "transaction_group": "A01-Revenue",
-            "transaction_type": "Rev-Interest"
+            "transaction_group": "B01-Security Deposit",  
+            "transaction_type": "Security-Expense"
         },
         {
-            "transaction_group": "A01-Revenue",
-            "transaction_type": "Exp-Repair"
+            "transaction_group": "B01-Security Deposit",   
+            "transaction_type": "Security-In"
         },
         {
-            "transaction_group": "DHI",
-            "transaction_type": "DHI"
+            "transaction_group": "B01-Security Deposit",
+            "transaction_type": "Security-Refund"
+        },
+        {
+            "transaction_group": "F01-Bank Transfer",
+            "transaction_type": "Transfer"
         }
     ]
 }
