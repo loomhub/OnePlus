@@ -62,16 +62,23 @@ class myFileHandler:
 
         return dto_list
 #############################################################################################################
+    def parse_date(self,date_str):
+        if len(date_str.split('/')[-1]) == 4:  # Check if the year part has four digits
+            return pd.to_datetime(date_str, format='%m/%d/%Y', errors='coerce')
+        else:
+            return pd.to_datetime(date_str, format='%m/%d/%y', errors='coerce')
+#############################################################################################################
     def convert_columns_to_date(self, 
                         df: pd.DataFrame, 
                         column_names: List[str],
                         **kwargs) -> pd.DataFrame:
         null_value_date = kwargs.get('null_value_date', '2099-12-31')
+  
         for column_name in column_names:
             if column_name in df.columns:
                 try:
                     df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
-                    df[column_name] = pd.to_datetime(df[column_name], format='%m/%d/%y', errors='coerce').dt.date
+                    df[column_name] = df[column_name].apply(self.parse_date).dt.date
                 except Exception as e:
                     print(f"Error converting {column_name}: {e}")
             else:

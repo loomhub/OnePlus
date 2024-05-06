@@ -32,7 +32,7 @@ class bankdownloadFileHandler(myFileHandler):
                 return {},errorsList
             else:
                 bankdownloads_data = self.convert_dataframe_to_list_dto(df,bankdownloadDTO)
-                return bankdownloadsListDTO(bankdownloads=bankdownloads_data)
+                return bankdownloadsListDTO(bankdownloads=bankdownloads_data),[]
         except Exception as e:
             raise HTTPException(status_code=400, detail=f"Error processing data: {str(e)}")
         

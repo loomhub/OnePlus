@@ -111,20 +111,12 @@ async def create_or_update_data(
      ):
     my_repository = bankdownloadRepository(db)
     my_service = bankdownloadService(my_repository)
-    results = []
-    for record in input_data.bankdownloads:
-        try:
-            key_fields = {'bank_account_key': record.bank_account_key,
-                        'tdate': record.tdate,
-                        'description': record.description,
-                        'amount': record.amount
-                          }  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
+
+    resultsList,errorsList = await my_service.post_data(input_data.bankdownloads, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
 ############################################################################################################
 
 @router.post(chase_upload, summary="Upload and save bankdownloads data from a CSV file")
@@ -134,29 +126,23 @@ async def upload_and_upsert_records(
     db: AsyncSession = Depends(get_session)
                                    ):
     
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
+
     my_filehandler = bankdownloadFileHandler(file)
-    input_data = my_filehandler.extract_data_from_file(
+    input_data, errorsList = my_filehandler.extract_data_from_file(
         column_names = CHASE_COLUMNS,
         rename_columns = 'X',
         fileheaders = None
     )
-
-    my_repository = bankdownloadRepository(db)
-    my_service = bankdownloadService(my_repository)
-    results = []
-    for record in input_data.bankdownloads:
-        try:
-            key_fields = {'bank_account_key': record.bank_account_key,
-                        'tdate': record.tdate,
-                        'description': record.description,
-                        'amount': record.amount
-                          }  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
+    if errorsList:
+        return errorsList
+   
+    resultsList,errorsList = await my_service.post_data(input_data.bankdownloads, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
     
 ############################################################################################################
 @router.post(wellsfargo_upload, summary="Upload and save bankdownloads data from a CSV file")
@@ -166,29 +152,24 @@ async def upload_and_upsert_records(
     db: AsyncSession = Depends(get_session)
                                    ):
     
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
+
     my_filehandler = bankdownloadFileHandler(file)
-    input_data = my_filehandler.extract_data_from_file(
+    input_data, errorsList = my_filehandler.extract_data_from_file(
         column_names = WELLSFARGO_COLUMNS,
         rename_columns = None,
         fileheaders = WELLSFARGO_FILEHEADERS
     )
-    my_repository = bankdownloadRepository(db)
-    my_service = bankdownloadService(my_repository)
-    results = []
-    for record in input_data.bankdownloads:
-        try:
-            key_fields = {'bank_account_key': record.bank_account_key,
-                        'tdate': record.tdate,
-                        'description': record.description,
-                        'amount': record.amount
-                          }  # Adjust according to actual key fields
-            created, result = await my_service.upsert_records(record, myModel, key_fields, update = query_params.update)
-            results.append( {"created": created, myObjects: result} )
-        except Exception as e:
-            logging.error(f"Failed to update or create record: {str(e)}")
-            raise HTTPException(status_code=400, detail=str(e))
-    return results
-    
+    if errorsList:
+        return errorsList
+   
+    resultsList,errorsList = await my_service.post_data(input_data.bankdownloads, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
+
 ############################################################################################################
 
 @router.delete(
