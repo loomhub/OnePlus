@@ -32,9 +32,9 @@ class myFileHandler:
         column_names = kwargs.get('column_names', None)
         try:
             if column_names:
-                return pd.read_csv(self.file_location, na_values=[], header=None, names=column_names)
+                return pd.read_csv(self.file_location, na_values=[], header=None, names=column_names,index_col=False)
             else:
-                return pd.read_csv(self.file_location, na_values=[])
+                return pd.read_csv(self.file_location, na_values=[],index_col=False)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to load file into DataFrame: {str(e)}")
 #############################################################################################################

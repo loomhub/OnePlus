@@ -1,7 +1,8 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.bankaccount_dto import bankaccountQueryEmail, bankaccountQueryPrimaryKey, bankaccountQueryUpdateFlag,bankaccountsListDTO, bankaccountsDelListDTO, bankaccountDTO
+from ..dtos.bankaccount_dto import bankaccountQueryPrimaryKey, bankaccountQueryUpdateFlag,bankaccountsListDTO, bankaccountsDelListDTO, bankaccountDTO
+from ..dtos.service_dto import QueryEmail
 from ..database.db import get_session
 from ..repositories.bankaccount_repository import bankaccountRepository
 from ..services.bankaccount_service import bankaccountService
@@ -56,14 +57,17 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
         )
 
 async def send_bankaccount_report(
-     query_params: bankaccountQueryEmail = Depends(),
+     query_params: QueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
     my_repository = bankaccountRepository(db)
     my_service = bankaccountService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
-        sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
+        sent = await my_service.check_keyword_and_send_email(results,
+                                                             get_all,
+                                                             receiver=query_params.receiver,
+                                                             keyword=query_params.keyword)
         if sent == False:
             results = []
 

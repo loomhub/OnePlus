@@ -1,4 +1,5 @@
 from email import encoders
+import imaplib, email, re
 from email.message import EmailMessage
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
@@ -9,6 +10,7 @@ from typing import BinaryIO, List, Optional, Tuple, Type, TypeVar,Dict
 import pandas as pd
 from pydantic import BaseModel
 from sqlalchemy.exc import SQLAlchemyError
+from ..dtos.service_dto import processedDTO, listProcessedDTO
 from ..models.emailConfig_model import emailsConfigModel
 from ..models.birds_model import birdsModel
 from ..repositories.myrepository import myRepository  # Assuming a base repository exists
@@ -18,6 +20,15 @@ DTO = TypeVar('DTO', bound=BaseModel) # Define a type variable that can be any s
 class MyService:
     def __init__(self, repository: myRepository):
         self.repository = repository
+        self.html="oneplus/mylibrary/templates/email_template.html"
+        self.imapServer = 'imap.gmail.com'
+        self.inbox = 'inbox'
+        self.server = ''
+        self.port = 0
+        self.sender = ''
+        self.pwd = ''
+        self.subject = ''
+        self.emailSentCompleted = listProcessedDTO()
 
     ############################################################################################################    
 
@@ -38,9 +49,6 @@ class MyService:
         except SQLAlchemyError as e:  # Handling more specific database errors
             await self.repository.rollback_changes()
             raise Exception(f"Database error: {str(e)}")
-        # except Exception as e:  # General exception if needed, though specific ones are preferred
-        #     await self.repository.rollback_changes()
-        #     raise Exception(f"Unexpected error: {str(e)}")
 
     ############################################################################################################
 
@@ -134,71 +142,72 @@ class MyService:
                     errors.append(f"Record {index} error: {key} is missing from the record")
         return errors
     ############################################################################################################
-    def set_email_addresses(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel) -> EmailMessage:
-        """
-        Creates email.
-        :param data: List of data to be sent
-        :param emailsConfig: Email configuration
-        :param bird: Sender email
-        :return: Email message
-        """
-        try:
-            msg['From'] = bird.sender
-            # Accumulate email addresses from all configs
-            to_addresses = []
-            cc_addresses = []
-            bcc_addresses = []
+    # def set_email_addresses(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel) -> EmailMessage:
+    #     """
+    #     Creates email.
+    #     :param data: List of data to be sent
+    #     :param emailsConfig: Email configuration
+    #     :param bird: Sender email
+    #     :return: Email message
+    #     """
+    #     try:
+    #         msg['From'] = bird.sender
+    #         # Accumulate email addresses from all configs
+    #         to_addresses = []
+    #         cc_addresses = []
+    #         bcc_addresses = []
 
-            for config in emailsConfig:
-                subject=config.subject
-                if config.to:
-                    to_addresses.append(config.to)
-                if config.cc:
-                    cc_addresses.append(config.cc)
-                if config.bcc:
-                    bcc_addresses.append(config.bcc)
+    #         for config in emailsConfig:
+    #             subject=config.subject
+    #             if config.to:
+    #                 to_addresses.append(config.to)
+    #             if config.cc:
+    #                 cc_addresses.append(config.cc)
+    #             if config.bcc:
+    #                 bcc_addresses.append(config.bcc)
 
-            # Join addresses with a comma
-            if to_addresses:
-                msg['To'] = ', '.join(to_addresses)
-            if cc_addresses:
-                msg['Cc'] = ', '.join(cc_addresses)
-            if bcc_addresses:
-                msg['Bcc'] = ', '.join(bcc_addresses)
+    #         # Join addresses with a comma
+    #         if to_addresses:
+    #             msg['To'] = ', '.join(to_addresses)
+    #         if cc_addresses:
+    #             msg['Cc'] = ', '.join(cc_addresses)
+    #         if bcc_addresses:
+    #             msg['Bcc'] = ', '.join(bcc_addresses)
             
-            msg['Subject'] = subject
+    #         msg['Subject'] = subject
 
-            return msg
-        except Exception as e:
-            raise Exception(f"Email creation error: {str(e)}")
+    #         return msg
+    #     except Exception as e:
+    #         raise Exception(f"Email creation error: {str(e)}")
 ############################################################################################################
-    def set_receiver(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel,receiver:str) -> EmailMessage:
-        """
-        Creates email.
-        :param data: List of data to be sent
-        :param emailsConfig: Email configuration
-        :param bird: Sender email
-        :return: Email message
-        """
-        try:
-            msg['From'] = bird.sender
-            # Accumulate email addresses from all configs
-            to_addresses = []
+    # def set_receiver(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel,receiver:str) -> EmailMessage:
+    #     """
+    #     Creates email.
+    #     :param data: List of data to be sent
+    #     :param emailsConfig: Email configuration
+    #     :param bird: Sender email
+    #     :return: Email message
+    #     """
+    #     try:
+    #         msg['From'] = bird.sender
+    #         # Accumulate email addresses from all configs
+    #         to_addresses = []
             
-            for config in emailsConfig:
-                subject=config.subject
-                if config.to == receiver:
-                    to_addresses.append(config.to)
+    #         for config in emailsConfig:
+    #             subject=config.subject
+    #             if config.to == receiver:
+    #                 to_addresses.append(config.to)
                 
-            # Join addresses with a comma
-            if to_addresses:
-                msg['To'] = ', '.join(to_addresses)
+    #         # Join addresses with a comma
+    #         if to_addresses:
+    #             msg['To'] = ', '.join(to_addresses)
             
-            msg['Subject'] = subject
+    #         msg['Subject'] = subject
 
-            return msg
-        except Exception as e:
-            raise Exception(f"Email creation error: {str(e)}")
+    #         return msg
+    #     except Exception as e:
+    #         raise Exception(f"Email creation error: {str(e)}")
+        
 ############################################################################################################
     def create_excel_file(self, data:list[BaseModel]) -> BytesIO:
         """
@@ -247,7 +256,7 @@ class MyService:
             raise Exception(f"Attachment error: {str(e)}")
 
 ############################################################################################################
-    def smpt_send_email(self,bird:BaseModel,msg:EmailMessage) -> bool:
+    def smpt_send_email(self,message:EmailMessage) -> bool:
         """
         Sends email.
         :param bird: Sender email
@@ -255,10 +264,10 @@ class MyService:
         :return: True if successful
         """
         try:
-            server = smtplib.SMTP(bird.server, bird.port)
+            server = smtplib.SMTP(self.server, self.port)
             server.starttls()
-            server.login(bird.sender, bird.pwd) 
-            server.send_message(msg)
+            server.login(self.sender, self.pwd) 
+            server.send_message(message)
             server.quit()
             print("Email sent successfully!")
             return True
@@ -281,33 +290,121 @@ class MyService:
             raise Exception(f"Email body creation error: {str(e)}")
 ############################################################################################################
 
-    async def send_email(self, data:list[BaseModel],endpoint:str,**kwargs) -> bool:
+    def send_email(self, response_data:list[BaseModel],receiver:str,**kwargs) -> bool:
         """
         Sends email.
         :param data: List of data to be sent
         :param endpoint: Email endpoint
         :return: True if successful
         """
-        receiver = kwargs.get('receiver', None) 
         try:
-            bird = await self.repository.retrieve_unique_record(birdsModel, {"active": "X"}) #Get sender email
-            if bird == None:
-                return False
-            active_endpoint = {"endpoint": endpoint, "inactive": ""}
-            emailsConfig = await self.repository.retrieve_unique_record(emailsConfigModel,active_endpoint,multiple="X") #Get email config
-            if emailsConfig == []:
-                return False
-            msg = MIMEMultipart()
-            if receiver:
-                msg = self.set_receiver(msg,emailsConfig,bird,receiver)
-            else:
-                msg = self.set_email_addresses(msg,emailsConfig,bird)         
-            if msg['To'] == None: 
-                return False
-            msg = self.set_email_body(msg,"oneplus/mylibrary/templates/email_template.html")
-            inMemoryExcel = self.create_excel_file(data)
-            msg=self.attach_file(msg,inMemoryExcel)
-            result=self.smpt_send_email(bird,msg)
+            message = MIMEMultipart()
+            message['From'] = self.sender
+            message['To'] = receiver
+            message['Subject'] = self.subject
+            message = self.set_email_body(message,self.html)
+            inMemoryExcel = self.create_excel_file(response_data)
+            message=self.attach_file(message,inMemoryExcel)
+            result=self.smpt_send_email(message)
             return result
         except Exception as e:
             raise Exception(f"Email send error: {str(e)}")  
+############################################################################################################ 
+    async def set_server_settings(self):  
+        bird = await self.repository.retrieve_unique_record(birdsModel, {"active": "X"}) #Get sender email
+        if bird == None:
+            return False
+        else:
+            self.server = bird.server
+            self.port = bird.port
+            self.sender = bird.sender
+            self.pwd = bird.pwd
+            return True 
+############################################################################################################        
+    def select_inbox(self):
+        mail = imaplib.IMAP4_SSL(self.imapServer)
+        mail.login(self.sender, self.pwd)
+        mail.select(self.inbox)
+        return mail
+############################################################################################################
+    def extract_email(self,address):
+        match = re.search(r'<([^>]+)>', address)
+        if match:
+            return match.group(1)
+        else:
+            return address   
+############################################################################################################
+    async def check_receiver_access(self,from_address:str,endpoint:str,receiver:str) -> str:
+        
+        from_address=self.extract_email(from_address)
+        if receiver == from_address:
+            # Check receiver access
+            active_endpoint = {"endpoint": endpoint, "to":receiver, "active": "Yes"}
+            emailsConfig = await self.repository.retrieve_unique_record(emailsConfigModel,active_endpoint) #Get email config
+            if emailsConfig == None:
+                return None
+            else:
+                self.subject = emailsConfig.subject
+                return receiver
+        else:
+            return None
+                        
+############################################################################################################
+    def process_email(self,
+                      response_data:list[BaseModel],
+                      receiver:str,keyword:str,
+                      mail:imaplib.IMAP4_SSL,
+                      num) -> bool:
+        sent=False
+        if not any(done.receiver == receiver and done.report == keyword for done in self.emailSentCompleted.done):
+            sent=self.send_email(response_data,receiver)
+            print(f"Email sent to {receiver}")
+            new_done = processedDTO(report=keyword, receiver=receiver)
+            self.emailSentCompleted.done.append(new_done)
+            mail.store(num, '+X-GM-LABELS', '\\Trash')
+        else:
+            print(f"Email already sent to {receiver}")
+            mail.store(num, '+X-GM-LABELS', '\\Trash')
+        return sent
+############################################################################################################
+    async def check_keyword_and_process_email(self,response_data:list[BaseModel],mail,endpoint:str,receiver:str,formatted_keyword:str,keyword:str) -> bool:
+        
+        sent = False
+        ttype, data = mail.search(None, formatted_keyword)
+      
+        for num in data[0].split():
+            typ, data = mail.fetch(num, '(RFC822)')
+            msg = email.message_from_bytes(data[0][1])
+            receiver = await self.check_receiver_access(msg['from'],endpoint,receiver)
+            if receiver:
+                sent = self.process_email(response_data,receiver,keyword,mail,num)
+        return sent
+############################################################################################################
+    async def check_keyword_and_send_email(self, response_data:list[BaseModel],endpoint:str,**kwargs) -> bool:
+            """
+            Sends email.
+            :param data: List of data to be sent
+            :param endpoint: Email endpoint
+            :return: True if successful
+            """
+            receiver = kwargs.get('receiver', None) 
+            keyword = kwargs.get('keyword', None) 
+            formatted_keyword = f'(SUBJECT "{keyword}")'
+            sent = False
+
+            try:
+                # Get email
+                success= await self.set_server_settings()
+                if not success:
+                    return False
+                
+                mail = self.select_inbox()
+                if mail:
+                    sent = await self.check_keyword_and_process_email(response_data,mail,endpoint,receiver,formatted_keyword,keyword)                
+                    mail.close()
+                    mail.logout()
+                return sent
+                
+            except Exception as e:
+                raise Exception(f"Email send error: {str(e)}")
+                

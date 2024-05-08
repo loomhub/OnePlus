@@ -40,9 +40,6 @@ class LLCQueryParams(BaseModel):
 class LLCQueryPrimaryKey(BaseModel):
     llc_name: str = Field(None, description="Name of the LLC to filter by")
 
-class LLCQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class llcQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

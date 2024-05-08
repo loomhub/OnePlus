@@ -42,9 +42,6 @@ class bankaccountQueryParams(BaseModel):
 class bankaccountQueryPrimaryKey(BaseModel):
     bank_account_key: Optional[str] = Field(None, description="Name of the bankaccount to filter by")
     
-class bankaccountQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class bankaccountQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

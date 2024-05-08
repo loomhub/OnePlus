@@ -58,9 +58,6 @@ class propertyMasterQueryParams(BaseModel):
 class propertyMasterQueryPrimaryKey(BaseModel):
     property_name: Optional[str] = Field(None, description="Name of the property to filter by")
 
-class propertyMasterQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class propertyMasterQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

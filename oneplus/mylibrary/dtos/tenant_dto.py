@@ -55,9 +55,6 @@ class tenantQueryPrimaryKey(BaseModel):
     lease_start: Optional[date] = Field(None, description="Date of the lease start to filter by")
     lease_end: Optional[date] = Field(None, description="Date of the lease end to filter by")
 
-class tenantQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class tenantQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

@@ -3,7 +3,7 @@
 @var1=value1 
 
 # @name get_bankdownload
-GET {{hostName}}/bankdownloads/email?receiver=vivekjadhava@yahoo.com
+GET {{hostName}}/bankdownloads/email?receiver=vivekjadhav@yahoo.com&keyword=Bank Downloads
 Content-Type: application/json
 
 ############################################################################################

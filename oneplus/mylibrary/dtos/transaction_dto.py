@@ -64,9 +64,7 @@ class transactionQueryPrimaryKey(BaseModel):
     tdate: Optional[date] = Field(None, description="Date of the transaction to filter by")
     description: Optional[str] = Field(None, description="Description of the transaction to filter by")
     amount: Optional[float] = Field(None, description="Amount of the transaction to filter by")
-    
-class transactionQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
+
 
 class transactionQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 

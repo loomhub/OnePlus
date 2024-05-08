@@ -51,9 +51,6 @@ class partnerQueryParams(BaseModel):
 class partnerQueryPrimaryKey(BaseModel):
     partner: Optional[str] = Field(None, description="Name of the LLC to filter by")
 
-class partnerQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class partnerQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

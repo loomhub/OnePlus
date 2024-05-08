@@ -1,6 +1,7 @@
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.transaction_dto import transactionQueryEmail, transactionQueryPrimaryKey,transactionQueryUpdateFlag
+from ..dtos.transaction_dto import transactionQueryPrimaryKey,transactionQueryUpdateFlag
+from ..dtos.service_dto import QueryEmail
 from ..dtos.transaction_dto import transactionsListDTO, transactionsDelListDTO, transactionDTO,TRANSACTIONS_COLUMNS
 from ..database.db import get_session
 from ..repositories.transaction_repository import transactionRepository
@@ -52,14 +53,17 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
         )
 
 async def send_transaction_report(
-     query_params: transactionQueryEmail = Depends(),
+     query_params: QueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
     my_repository = transactionRepository(db)
     my_service = transactionService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
-        sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
+        sent = await my_service.check_keyword_and_send_email(results,
+                                                             get_all,
+                                                             receiver=query_params.receiver,
+                                                             keyword=query_params.keyword)
         if sent == False:
             results = []
 

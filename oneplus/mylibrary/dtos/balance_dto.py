@@ -43,9 +43,6 @@ class balanceQueryPrimaryKey(BaseModel):
     bank_account_key : Optional[str] = None
     snapshot : Optional[date] = None
 
-class balanceQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class balanceQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

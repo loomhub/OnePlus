@@ -3,7 +3,7 @@
 @var1=value1 
 
 # @name get_transaction
-GET {{hostName}}/partners/email?receiver=vivekjadhav@yahoo.com
+GET {{hostName}}/partners/email?receiver=vivekjadhav@yahoo.com&keyword=Partners
 Content-Type: application/json
 
 ############################################################################################

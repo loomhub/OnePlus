@@ -1,7 +1,8 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.bankdownload_dto import CHASE_COLUMNS, WELLSFARGO_COLUMNS, WELLSFARGO_FILEHEADERS, bankdownloadQueryEmail, bankdownloadQueryPrimaryKey, bankdownloadQueryUpdateFlag,bankdownloadsListDTO, bankdownloadsDelListDTO, bankdownloadDTO
+from ..dtos.bankdownload_dto import CHASE_COLUMNS, WELLSFARGO_COLUMNS, WELLSFARGO_FILEHEADERS, bankdownloadQueryPrimaryKey, bankdownloadQueryUpdateFlag,bankdownloadsListDTO, bankdownloadsDelListDTO, bankdownloadDTO
+from ..dtos.service_dto import QueryEmail
 from ..database.db import get_session
 from ..repositories.bankdownload_repository import bankdownloadRepository
 from ..services.bankdownload_service import bankdownloadService
@@ -54,14 +55,17 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
         )
 
 async def send_bankdownload_report(
-     query_params: bankdownloadQueryEmail = Depends(),
+     query_params: QueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
     my_repository = bankdownloadRepository(db)
     my_service = bankdownloadService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
-        sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
+        sent = await my_service.check_keyword_and_send_email(results,
+                                                             get_all,
+                                                             receiver=query_params.receiver,
+                                                             keyword=query_params.keyword)
         if sent == False:
             results = []
 

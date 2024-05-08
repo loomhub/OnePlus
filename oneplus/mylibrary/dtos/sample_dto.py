@@ -33,9 +33,6 @@ class sampleQueryParams(BaseModel):
 class sampleQueryPrimaryKey(BaseModel):
     sample: Optional[str] = Field(None, description="Name of the sample to filter by")
 
-class sampleQueryEmail(BaseModel):
-    receiver: Optional[str] = Field(None, description="Name of the email receiver")
-
 class sampleQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 

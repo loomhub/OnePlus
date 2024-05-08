@@ -1,7 +1,8 @@
 
 from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.partner_dto import partnerQueryEmail, partnerQueryPrimaryKey, partnerQueryUpdateFlag,partnersListDTO, partnersDelListDTO, partnerDTO
+from ..dtos.partner_dto import partnerQueryPrimaryKey, partnerQueryUpdateFlag,partnersListDTO, partnersDelListDTO, partnerDTO
+from ..dtos.service_dto import QueryEmail
 from ..database.db import get_session
 from ..repositories.partner_repository import partnerRepository
 from ..services.partner_service import partnerService
@@ -53,14 +54,17 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
         )
 
 async def send_partner_report(
-     query_params: partnerQueryEmail = Depends(),
+     query_params: QueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
     my_repository = partnerRepository(db)
     my_service = partnerService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
-        sent = await my_service.send_email(results,get_all,receiver=query_params.receiver)
+        sent = await my_service.check_keyword_and_send_email(results,
+                                                             get_all,
+                                                             receiver=query_params.receiver,
+                                                             keyword=query_params.keyword)
         if sent == False:
             results = []
 

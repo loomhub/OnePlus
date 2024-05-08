@@ -1,19 +1,21 @@
 ﻿Subject,Endpoint,To,CC,BCC,Active
-LLC report,/llcs,vivekjadhav@yahoo.com,,,
-LLC report,/llcs,vjnyustern@gmail.com,,,
-Account Balances report,/balances,vivekjadhav@yahoo.com,,,
-Account Balances report,/balances,vjnyustern@gmail.com,,,
-Bank Accounts report,/bankaccounts,vivekjadhav@yahoo.com,,,
-Bank Accounts report,/bankaccounts,vjnyustern@gmail.com,,,
-Bank Downloads report,/bankdownloads,vivekjadhav@yahoo.com,,,
-Bank Downloads report,/bankdownloads,vjnyustern@gmail.com,,,
-Email Access report,/emailsConfig,vivekjadhav@yahoo.com,,,
-Email Access report,/emailsConfig,vjnyustern@gmail.com,,,
-Business Partners report,/partners,vivekjadhav@yahoo.com,,,
-Business Partners report,/partners,vjnyustern@gmail.com,,,
-Property Master report,/propertyMasters,vivekjadhav@yahoo.com,,,
-Property Master report,/propertyMasters,vjnyustern@gmail.com,,,
-Tenant report,/tenants,vivekjadhav@yahoo.com,,,
-Tenant report,/tenants,vjnyustern@gmail.com,,,
-Transactions report,/transactions,vivekjadhav@yahoo.com,,,
-Transactions report,/transactions,vjnyustern@gmail.com,,,
+LLC report,/llcs,vivekjadhav@yahoo.com,,,Yes
+LLC report,/llcs,vjnyustern@gmail.com,,,Yes
+Account Balances report,/balances,vivekjadhav@yahoo.com,,,Yes
+Account Balances report,/balances,vjnyustern@gmail.com,,,Yes
+Bank Accounts report,/bankaccounts,vivekjadhav@yahoo.com,,,Yes
+Bank Accounts report,/bankaccounts,vjnyustern@gmail.com,,,Yes
+Bank Downloads report,/bankdownloads,vivekjadhav@yahoo.com,,,Yes
+Bank Downloads report,/bankdownloads,vjnyustern@gmail.com,,,Yes
+Email Access report,/emailsConfig,vivekjadhav@yahoo.com,,,Yes
+Email Access report,/emailsConfig,vjnyustern@gmail.com,,,Yes
+Business Partners report,/partners,vivekjadhav@yahoo.com,,,Yes
+Business Partners report,/partners,vjnyustern@gmail.com,,,Yes
+Property Master report,/propertyMasters,vivekjadhav@yahoo.com,,,Yes
+Property Master report,/propertyMasters,vjnyustern@gmail.com,,,Yes
+Tenant report,/tenants,vivekjadhav@yahoo.com,,,Yes
+Tenant report,/tenants,vjnyustern@gmail.com,,,Yes
+Transactions report,/transactions,vivekjadhav@yahoo.com,,,Yes
+Transactions report,/transactions,vjnyustern@gmail.com,,,Yes
+Transaction Types report,/transactionTypes,vivekjadhav@yahoo.com,,,Yes
+Transaction Types report,/transactionTypes,vjnyustern@gmail.com,,,Yes
