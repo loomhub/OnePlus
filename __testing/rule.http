@@ -1,0 +1,71 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_rule
+GET {{hostName}}/rules/email?receiver=vivekjadhav@yahoo.com&keyword=Transactions
+Content-Type: application/json
+
+############################################################################################
+# @name get_rule
+GET {{hostName}}/rules
+Content-Type: application/json
+############################################################################################
+GET {{hostName}}/rules/pkey?ttype=credit&description=trulo
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_rules
+POST {{hostName}}/rules
+Content-Type: application/json
+
+{
+    "rules": [
+        {
+            "ttype": "credit",
+            "description": "trulo",
+            "transaction_group": "A01-Income",
+            "transaction_type": "Exp-Mgmt",
+            "vendor": "W9-TRULO",
+            "customer": "GeneralCustomer",
+            "vendor_no_w9": "W9-TRULO",
+            "customer_no_w9": "bank_account_key"
+    },
+    {
+            "ttype": "debit",
+            "description": "trulo",
+            "transaction_group": "A01-Income",
+            "transaction_type": "Exp-Mgmt",
+            "vendor": "GeneralVendor",
+            "customer": "W9-TRULO",
+            "vendor_no_w9": "bank_account_key",
+            "customer_no_w9": "W9-TRULO"
+    }
+    ]
+}
+############################################################################################
+# @name delete_rules
+#DELETE {{hostName}}/rulesdel
+DELETE http://localhost:8080/rulesdel
+Content-Type: application/json
+
+
+{
+    "rulesDel": [
+        {
+            "ttype": "credit",
+            "description": "trulo"
+        },
+        {
+            "ttype": "debit",
+            "description": "trulo"
+        },
+        {
+            "ttype": "credit",
+            "description": "oneplus"
+        }
+    ]
+}
+############################################################################################
+

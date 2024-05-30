@@ -79,13 +79,13 @@ Content-Type: application/json
 {
     "partnersDel": [
         {
-            "partner": "W9-AAA_SERVICES"
+            "partner": "W9-IPINA ANGEL"
         },
         {
-            "partner": "W9-BBB_SERVICES"
+            "partner": "W9-VALENTINE DIAZ"
         },
         {
-            "partner": "W9-AAA_SERVIC"
+            "partner": "W9-JOSE LANDSCAPE"
         }
     ]
 }

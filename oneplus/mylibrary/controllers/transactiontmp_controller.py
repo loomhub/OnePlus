@@ -1,26 +1,32 @@
-from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
+from fastapi import APIRouter, File, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..dtos.transaction_dto import transactionQueryPrimaryKey,transactionQueryUpdateFlag, transactionSearchQuery
 from ..dtos.service_dto import QueryEmail
 from ..dtos.transaction_dto import transactionsListDTO, transactionsDelListDTO, transactionDTO,TRANSACTIONS_COLUMNS
 from ..database.db import get_session
-from ..repositories.transaction_repository import transactionRepository
-from ..services.transaction_service import transactionService
-from ..services.transaction_filehandler import transactionFileHandler
+from ..repositories.transactiontmp_repository import transactiontmpRepository
+from ..services.transactiontmp_service import transactiontmpService
+from ..models.transactionstmp_model import transactionstmpModel
 from ..models.transactions_model import transactionsModel
+from ..models.rules_model import rulesModel
+from ..models.bankdownloads_model import bankdownloadsModel
 
 # DEFINITIONS
-get_pkey="/transactions/pkey"
-get_all=post_all="/transactions"
-search="/transactions/search"
-send_transaction_report="/transactions/email"
-del_all = "/transactionsdel"
-excel_upload = "/transactionsxl"
+get_pkey="/transactionstmp/pkey"
+get_all=post_all="/transactionstmp"
+search="/transactionstmp/search"
+send_transaction_report="/transactionstmp/email"
+del_all = "/transactionstmpdel"
+apply_rules = "/applyrules"
 myObjects="transactions"
 get_response_model=transactionsListDTO
 get_pkey_model = transactionDTO
 del_response_model=transactionsDelListDTO
-myModel=transactionsModel
+historyModel=transactionsModel
+newDataModel=bankdownloadsModel
+myModel=transactionstmpModel
+myDTO=transactionDTO
+rulesDataModel=rulesModel
 
 router = APIRouter()
 
@@ -35,8 +41,8 @@ router = APIRouter()
         )
 
 async def get_all_records(db: AsyncSession = Depends(get_session)):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
     except Exception as e:
@@ -57,8 +63,8 @@ async def send_transaction_report(
      query_params: QueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
         sent = await my_service.check_keyword_and_send_email(results,
@@ -85,8 +91,8 @@ async def get_record_by_pkey(
     query_params: transactionQueryPrimaryKey = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
     try:
         key_fields = {'bank_account_key': query_params.bank_account_key,
                         'tdate': query_params.tdate,
@@ -114,8 +120,8 @@ async def search_records(
     query_params: transactionSearchQuery = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
     try:
         key_fields = {  'start_date': query_params.start_date,
                         'end_date': query_params.end_date,
@@ -147,8 +153,8 @@ async def create_or_update_data(
      query_params: transactionQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)):
 
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
 
     resultsList,errorsList = await my_service.post_data(input_data.transactions, myModel, query_params.update,myObjects)
     if errorsList:
@@ -156,29 +162,6 @@ async def create_or_update_data(
     else:
          return resultsList  
     
-############################################################################################################
-
-@router.post(excel_upload, summary="Upload and save transactions data from a CSV file")
-async def upload_and_upsert_records(
-    file: UploadFile = File(...),
-    query_params: transactionQueryUpdateFlag = Depends(),
-    db: AsyncSession = Depends(get_session)
-                                   ):
-    
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
-
-    my_filehandler = transactionFileHandler(file)
-    input_data, errorsList = my_filehandler.extract_data_from_file(column_names = TRANSACTIONS_COLUMNS)
-    
-    if errorsList:
-        return errorsList
-
-    resultsList,errorsList = await my_service.post_data(input_data.transactions, myModel, query_params.update,myObjects)
-    if errorsList:
-         return errorsList
-    else:
-         return resultsList  
 ############################################################################################################
 @router.delete(
         del_all,
@@ -187,8 +170,8 @@ async def upload_and_upsert_records(
         tags=["Delete"],
         )
 async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = transactionRepository(db)
-    my_service = transactionService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
     results = []
     for record in input_data.transactionsDel:   
         try:
@@ -203,3 +186,44 @@ async def delete_record(input_data: del_response_model, db: AsyncSession = Depen
             raise HTTPException(status_code=400, detail=str(e))
     return results
 ############################################################################################################
+@router.post(
+        apply_rules,
+        summary="Apply business rules",
+        description="Store data after applying business rules in database",
+        tags=["Apply Rules"],
+        )
+async def apply_rules(
+     input_data: get_response_model,
+     query_params: transactionSearchQuery = Depends(),
+                        db: AsyncSession = Depends(get_session)):
+
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
+
+    resultTransList,errorTransList = await my_service.apply_rules( input_data.transactions,myModel,
+                                                myDTO,historyModel,newDataModel,rulesDataModel,
+                                                query_params.start_date,query_params.end_date)
+    if errorTransList:
+        return errorTransList
+    else:
+        resultsList,errorsList = await my_service.post_data(resultTransList, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
+############################################################################################################
+# @router.post(
+#         ml,
+#         summary="Apply machine learning model",
+#         description="Store machine learning results in database",
+#         tags=["ML"],
+#         )
+# async def machine_learn(query_params: transactionSearchQuery = Depends(),
+#                         db: AsyncSession = Depends(get_session)):
+
+#     my_repository = transactiontmpRepository(db)
+#     my_service = transactiontmpService(my_repository)
+
+#     resultsList = await my_service.machine_learn(myModel,historyModel,newDataModel,
+#                                                  query_params.start_date,query_params.end_date,myObjects)
+#     return resultsList  

@@ -12,7 +12,7 @@ GET {{hostName}}/transactions
 Content-Type: application/json
 ############################################################################################
 # @name get_transaction
-GET {{hostName}}/search/transactions?transaction_name=Y&start_date=1990-12-31
+GET {{hostName}}/transactions/search?bank_account_key=108Pagoda&start_date=2013-09-12
 Content-Type: application/json
 
 ############################################################################################
@@ -78,17 +78,18 @@ Content-Type: application/json
 
 ############################################################################################
 # @name delete_transactions
-DELETE {{hostName}}/transactionsdel
+#DELETE {{hostName}}/transactionsdel
+DELETE http://localhost:8080/transactionsdel
 Content-Type: application/json
 
 
 {
     "transactionsDel": [
         {
-            "bank_account_key": "104Meadow",
-            "tdate": "2022-01-02",
-            "description": "Security Deposit",
-            "amount": 1100.20
+            "bank_account_key": "108Pagoda",
+            "tdate": "2013-09-30",
+            "description": "Made 4 payments through Neeraj to Pagoda LLC",
+            "amount": 16000.00
         },
         {
             "bank_account_key": "104Mead",

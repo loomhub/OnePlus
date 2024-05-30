@@ -1,5 +1,6 @@
 from datetime import date
 from typing import List, Optional, Type
+import pandas as pd
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -17,6 +18,7 @@ class myRepository:
                 return result.scalars().all()
         except Exception as e:
             raise e
+############################################################################################################
         
     async def retrieve_unique_record(self, model: Type[BaseModel], filters: dict,**kwargs) -> Optional[BaseModel]:
         """
@@ -44,7 +46,7 @@ class myRepository:
         # Handle any other exceptions that may not be related to the database
             print(f"An error occurred: {e}")
             return None
-            
+############################################################################################################            
     async def add_data(self, data_model: Type[BaseModel])-> BaseModel:
         try:
             self.db_session.add(data_model)
@@ -53,7 +55,7 @@ class myRepository:
         except Exception as e:
             await self.db_session.rollback()
             raise e
-    
+#######    
     async def delete_data(self, data_model: Type[BaseModel]) -> bool:
         try:    
             async with self.db_session as session:
@@ -63,13 +65,15 @@ class myRepository:
         except Exception as e:
             await self.db_session.rollback()
             raise e
-
+############################################################################################################
     async def commit_changes(self) -> None:
         try:
             await self.db_session.commit()
         except Exception as e:
             await self.db_session.rollback()
             raise e
-
+############################################################################################################
     async def rollback_changes(self) -> None:
         await self.db_session.rollback()
+############################################################################################################
+    

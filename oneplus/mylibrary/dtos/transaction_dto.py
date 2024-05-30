@@ -18,6 +18,9 @@ class transactionDTO(BaseModel):
     customer_no_w9 : Optional[str] = None
     class Config:
         orm_mode = True
+
+class transactionsListDTO(BaseModel):
+    transactions: List[transactionDTO]
     
 class transactionFullDTO(BaseModel):
     id : Optional[int] = None
@@ -37,9 +40,6 @@ class transactionFullDTO(BaseModel):
     class Config:
         orm_mode = True
 
-class transactionsListDTO(BaseModel):
-    transactions: List[transactionDTO]
-
 class transactionsFullListDTO(BaseModel):
     transactions: List[transactionFullDTO]
 
@@ -52,12 +52,18 @@ class transactionDelDTO(BaseModel):
 class transactionsDelListDTO(BaseModel):
     transactionsDel: List[transactionDelDTO]
 
-class transactionQueryParams(BaseModel):
-    bank_account_key: Optional[str] = Field(None, description="Name of the bankaccount to filter by")
-    tdate: Optional[date] = Field(None, description="Date of the transaction to filter by")
+class transactionSearchQuery(BaseModel):
+    start_date: Optional[date] = Field(None, description="Start date for transaction date range")
+    end_date: Optional[date] = Field(None, description="End date for transaction date range")
+    min_amount: Optional[float] = Field(None, description="Minimum amount for transaction amount range")
+    max_amount: Optional[float] = Field(None, description="Maximum amount for transaction amount range")
+    classification: Optional[str] = Field(None, description="Classification of the transaction to filter by")
+    transaction_group: Optional[str] = Field(None, description="Transaction group to filter by")
+    transaction_type: Optional[str] = Field(None, description="Transaction type to filter by")
     description: Optional[str] = Field(None, description="Description of the transaction to filter by")
-    amount: Optional[float] = Field(None, description="Amount of the transaction to filter by")
-    
+    vendor: Optional[str] = Field(None, description="Vendor of the transaction to filter by")
+    customer: Optional[str] = Field(None, description="Customer of the transaction to filter by")
+    update: Optional[str] = Field(None, description="Set X to update the record even if it exists")
     
 class transactionQueryPrimaryKey(BaseModel):
     bank_account_key: Optional[str] = Field(None, description="Name of the bankaccount to filter by")

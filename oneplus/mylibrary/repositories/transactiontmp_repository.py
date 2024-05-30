@@ -5,7 +5,7 @@ from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
 from .myrepository import myRepository
 
-class transactionRepository(myRepository):
+class transactiontmpRepository(myRepository):
     def __init__(self, db_session: AsyncSession):
         super().__init__(db_session)
 

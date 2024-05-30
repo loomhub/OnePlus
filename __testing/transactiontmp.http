@@ -1,0 +1,179 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transactiontmp
+GET {{hostName}}/transactionstmp/email?receiver=vivekjadhav@yahoo.com&keyword=Transactions
+Content-Type: application/json
+
+############################################################################################
+# @name get_transactiontmp
+GET {{hostName}}/transactionstmp
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/transactionstmp/search?bank_account_key=108Pagoda&start_date=2013-09-12
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/transactionstmp/pkey?transaction_group=A01-Revenue&transaction_type=Rev-Interest
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactionstmp
+POST {{hostName}}/transactionstmp
+Content-Type: application/json
+
+
+{
+    "transactions": [
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2021-01-01",
+            "description": "AC Repair",
+            "amount": -100.00,
+            "classification": "Clean",
+            "period_status": "Closed",
+            "transaction_group": "A02 - Expense",
+            "transaction_type": "Exp-Repair",
+            "vendor": "W9-ADELINA",
+            "customer": "NA",
+            "comments": "AC Repair",
+            "vendor_no_w9": "AC Repair",
+            "customer_no_w9": "NA"
+    },
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2021-01-02",
+            "description": "Toilet Repair",
+            "amount": -100.00,
+            "classification": "Clean",
+            "period_status": "Closed",
+            "transaction_group": "A02 - Expense",
+            "transaction_type": "Exp-Repair",
+            "vendor": "W9-DANNY",
+            "customer": "NA",
+            "comments": "Plumbing Repair",
+            "vendor_no_w9": "Plumbing Repair",
+            "customer_no_w9": "NA"
+    },
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2022-01-02",
+            "description": "Security Deposit",
+            "amount": 1100.20,
+            "classification": "Clean",
+            "period_status": "Closed",
+            "transaction_group": "A07 - Security Deposit",
+            "transaction_type": "Liab-Security",
+            "vendor": "NA",
+            "customer": "NA",
+            "comments": "Security Deposit",
+            "vendor_no_w9": "NA",
+            "customer_no_w9": "Security Deposit"
+    }
+    ]
+}
+
+############################################################################################
+# @name delete_transactionstmp
+#DELETE {{hostName}}/transactionsdel
+DELETE http://localhost:8080/transactionstmpdel
+Content-Type: application/json
+
+
+{
+    "transactionsDel": [
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2021-01-01",
+            "description": "AC Repair",
+            "amount": -100.00
+    },
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2021-01-02",
+            "description": "Toilet Repair",
+            "amount": -100.00
+    },
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2022-01-02",
+            "description": "Security Deposit",
+            "amount": 1100.20
+    }
+    ]
+}
+############################################################################################
+
+############################################################################################
+# @name ml
+POST {{hostName}}/applyrules?start_date=2024-01-01&end_date=2024-01-31&update=X
+Content-Type: application/json
+
+{
+    "transactions": [
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2021-01-01",
+            "description": "AC Repair",
+            "amount": -100.00,
+            "classification": "clean",
+            "period_status": "open",
+            "transaction_group": "A02 - Expense",
+            "transaction_type": "Exp-Repair",
+            "vendor": "W9-ADELINA",
+            "customer": "NA",
+            "comments": "AC Repair",
+            "vendor_no_w9": "AC Repair",
+            "customer_no_w9": "NA"
+    },
+    {
+    "bank_account_key": "104Meadow",
+    "tdate": "2024-01-11",
+    "description": "OnePlus Realty G SIGONFILE 011124 WQS082 Meadow View Homes LLC",
+    "amount": 2259.0,
+    "classification": "clean",
+    "period_status": "open",
+    "transaction_group": "A01-Income",
+    "transaction_type": "Rev-Rent",
+    "vendor": "104Meadow",
+    "customer": "W9-ONEPLUS",
+    "comments": "Initial",
+    "vendor_no_w9": "104Meadow",
+    "customer_no_w9": "W9-ONEPLUS"
+  },
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2021-01-02",
+            "description": "Toilet Repair",
+            "amount": -100.00,
+            "classification": "Clean",
+            "period_status": "Closed",
+            "transaction_group": "A02 - Expense",
+            "transaction_type": "Exp-Repair",
+            "vendor": "W9-DANNY",
+            "customer": "NA",
+            "comments": "Plumbing Repair",
+            "vendor_no_w9": "Plumbing Repair",
+            "customer_no_w9": "NA"
+    },
+        {
+            "bank_account_key": "104Meadow",
+            "tdate": "2022-01-02",
+            "description": "Security Deposit",
+            "amount": 1100.20,
+            "classification": "Clean",
+            "period_status": "Closed",
+            "transaction_group": "A07 - Security Deposit",
+            "transaction_type": "Liab-Security",
+            "vendor": "NA",
+            "customer": "NA",
+            "comments": "Security Deposit",
+            "vendor_no_w9": "NA",
+            "customer_no_w9": "Security Deposit"
+    }
+    ]
+}
+

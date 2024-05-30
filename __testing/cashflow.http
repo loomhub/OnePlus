@@ -1,0 +1,87 @@
+@hostName = http://localhost:8080
+
+@var1=value1 
+
+# @name get_transaction
+GET {{hostName}}/cashflows/email?receiver=vivekjadhav@yahoo.com&keyword=Account Balances
+Content-Type: application/json
+
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/cashflows
+Content-Type: application/json
+############################################################################################
+# @name get_transaction
+GET {{hostName}}/search/cashflows?cashflow_name=Y&start_date=1990-12-31
+Content-Type: application/json
+
+############################################################################################
+GET {{hostName}}/cashflows/pkey?cashflow_name=MID
+Content-Type: application/json    
+
+
+############################################################################################
+# @name post_transactions
+POST {{hostName}}/cashflows
+Content-Type: application/json
+
+
+{
+    "cashflows": [
+        {
+            "bank_account_key" : "104Meadow",
+            "start_date": "2022-06-01",
+            "end_date": "2022-06-30",
+            "cash_change": "1200",
+            "ending_balance": "10000",
+            "calc_balance": "10000",
+            "period_status": "closed"
+        },
+        {
+            "bank_account_key" : "104Meadow",
+            "start_date": "2022-07-01",
+            "end_date": "2022-07-31",
+            "cash_change": "100",
+            "ending_balance": "1100",
+            "calc_balance": "11000",
+            "period_status": "closed"
+        },
+        {
+            "bank_account_key" : "104Meadow",
+            "start_date": "2022-08-01",
+            "end_date": "2022-08-31",
+            "cash_change": "200",
+            "ending_balance": "1200",
+            "calc_balance": "1100",
+            "period_status": "closed"
+        }
+    ]
+}
+
+############################################################################################
+# @name delete_cashflows
+DELETE {{hostName}}/cashflowsdel
+Content-Type: application/json
+
+
+{
+    "cashflowsDel": [
+        {
+            "bank_account_key" : "104Meadow",
+            "start_date": "2022-06-01",
+            "end_date": "2022-06-30"
+        },
+        {
+            "bank_account_key" : "104Meadow",
+            "start_date": "2022-07-01",
+            "end_date": "2022-07-31"
+        },
+        {
+            "bank_account_key" : "104Meadow",
+            "start_date": "2022-08-01",
+            "end_date": "2022-08-31"
+        }
+    ]
+}
+############################################################################################
+

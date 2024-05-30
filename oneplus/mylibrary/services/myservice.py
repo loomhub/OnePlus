@@ -1,3 +1,4 @@
+from datetime import date
 from email import encoders
 import imaplib, email, re
 from email.message import EmailMessage
@@ -50,6 +51,16 @@ class MyService:
             await self.repository.rollback_changes()
             raise Exception(f"Database error: {str(e)}")
 
+    ############################################################################################################
+    async def search_records(self,model: Type[BaseModel],search_fields: dict) -> Optional[list]:
+        try:
+            result = await self.repository.retrieve_search_records(model, search_fields)
+            if result is None:
+                print("Record not found")
+            return result
+        except SQLAlchemyError as e:  # Handling more specific database errors
+            await self.repository.rollback_changes()
+            raise Exception(f"Database error: {str(e)}")
     ############################################################################################################
 
     async def upsert_records(self, data_dto:DTO, model: Type[BaseModel], key_fields: dict,**kwargs) -> Tuple[bool, BaseModel]:
@@ -141,73 +152,120 @@ class MyService:
                 else:
                     errors.append(f"Record {index} error: {key} is missing from the record")
         return errors
-    ############################################################################################################
-    # def set_email_addresses(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel) -> EmailMessage:
-    #     """
-    #     Creates email.
-    #     :param data: List of data to be sent
-    #     :param emailsConfig: Email configuration
-    #     :param bird: Sender email
-    #     :return: Email message
-    #     """
-    #     try:
-    #         msg['From'] = bird.sender
-    #         # Accumulate email addresses from all configs
-    #         to_addresses = []
-    #         cc_addresses = []
-    #         bcc_addresses = []
-
-    #         for config in emailsConfig:
-    #             subject=config.subject
-    #             if config.to:
-    #                 to_addresses.append(config.to)
-    #             if config.cc:
-    #                 cc_addresses.append(config.cc)
-    #             if config.bcc:
-    #                 bcc_addresses.append(config.bcc)
-
-    #         # Join addresses with a comma
-    #         if to_addresses:
-    #             msg['To'] = ', '.join(to_addresses)
-    #         if cc_addresses:
-    #             msg['Cc'] = ', '.join(cc_addresses)
-    #         if bcc_addresses:
-    #             msg['Bcc'] = ', '.join(bcc_addresses)
-            
-    #         msg['Subject'] = subject
-
-    #         return msg
-    #     except Exception as e:
-    #         raise Exception(f"Email creation error: {str(e)}")
 ############################################################################################################
-    # def set_receiver(self, msg:EmailMessage, emailsConfig:list[BaseModel],bird:BaseModel,receiver:str) -> EmailMessage:
-    #     """
-    #     Creates email.
-    #     :param data: List of data to be sent
-    #     :param emailsConfig: Email configuration
-    #     :param bird: Sender email
-    #     :return: Email message
-    #     """
-    #     try:
-    #         msg['From'] = bird.sender
-    #         # Accumulate email addresses from all configs
-    #         to_addresses = []
-            
-    #         for config in emailsConfig:
-    #             subject=config.subject
-    #             if config.to == receiver:
-    #                 to_addresses.append(config.to)
-                
-    #         # Join addresses with a comma
-    #         if to_addresses:
-    #             msg['To'] = ', '.join(to_addresses)
-            
-    #         msg['Subject'] = subject
-
-    #         return msg
-    #     except Exception as e:
-    #         raise Exception(f"Email creation error: {str(e)}")
+#############################################################################################################
+    def parse_date(self,date_str):
+        """Parse a date string into a date object with coercion for two different year formats."""
+        if pd.isna(date_str):
+            return None  # Directly return None for NaN values
+        # Check if the date is in the format "YYYY-MM-DD"
+        if len(date_str.split('-')) == 3 and len(date_str.split('-')[0]) == 4:
+            return pd.to_datetime(date_str, format='%Y-%m-%d', errors='coerce')
         
+        if len(date_str.split('/')[-1]) == 4:
+            return pd.to_datetime(date_str, format='%m/%d/%Y', errors='coerce')
+        else:
+            return pd.to_datetime(date_str, format='%m/%d/%y', errors='coerce')
+#############################################################################################################
+    # Convert the DataFrame to a list of dictionaries
+    def format_date(self,x):
+        return x.strftime('%Y-%m-%d') if not pd.isna(x) and isinstance(x, date) else None
+#############################################################################################################
+    def convert_variable_to_date(self,input):
+        if not pd.api.types.is_datetime64_any_dtype(input):
+            input = input.apply(self.parse_date)
+            input = pd.to_datetime(input).dt.normalize()
+        return input
+#############################################################################################################
+    def convert_columns_to_date(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str],
+                        **kwargs) -> pd.DataFrame:
+        null_value_date = kwargs.get('null_value_date', '2099-12-31')
+  
+        for column_name in column_names:
+            if column_name in df.columns:
+                if not pd.api.types.is_datetime64_any_dtype(df[column_name]):
+                    # Apply the date parsing method and handle NaN values after conversion
+                    df[column_name] = df[column_name].apply(self.parse_date)
+                    # Replace NaT with a default date and ensure all operations are on datetime format
+                    df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
+                    df[column_name] = pd.to_datetime(df[column_name]).dt.normalize()
+                    # Convert datetime to date (optional: remove if you prefer datetime objects)
+                    #df[column_name] = df[column_name].dt.date
+                    # Format the date as a string in the desired format
+                    #df[column_name] = df[column_name].apply(self.format_date) 
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        
+        return df
+############################################################################################################  
+    def convert_columns_to_string(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str],**kwargs) -> pd.DataFrame:
+        na_values = kwargs.get('na_values', '')
+        for column_name in column_names:
+            if column_name in df.columns:
+                try:
+                    df[column_name] = df[column_name].fillna(na_values).astype(str)
+                except Exception as e:
+                    print(f"Error converting {column_name}: {e}")
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        return df
+#############################################################################################################    
+    def convert_columns_to_numeric(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str]) -> pd.DataFrame:
+        for column_name in column_names:
+            if column_name in df.columns:
+                try:
+                    df[column_name] = df[column_name].fillna(0).astype(str)
+                    df[column_name] = df[column_name].str.replace(',', '').str.replace('$', '')
+                    df[column_name] = df[column_name].str.replace('(', '-').str.replace(')', '')
+                    # Handle the case where "-" should be converted to 0, but not affect numbers like "-90"
+                    df[column_name] = df[column_name].apply(lambda x: '0' if x.strip() == '-' else x)
+                    #df[column_name] = df[column_name].str.replace(r'\((\d+)\)', r'-\1', regex=True).astype(float)
+                    df[column_name] = pd.to_numeric(df[column_name], errors='coerce')   
+                except Exception as e:
+                    print(f"Error converting {column_name}: {e}")
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        return df
+#############################################################################################################    
+    def convert_columns_to_int(self, 
+                        df: pd.DataFrame, 
+                        column_names: List[str]) -> pd.DataFrame:
+        for column_name in column_names:
+            if column_name in df.columns:
+                try:
+                    df[column_name] = df[column_name].astype(int)
+                except Exception as e:
+                    print(f"Error converting {column_name}: {e}")
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        return df
+#############################################################################################################  
+    def convert_dataframe_columns(self,dfs: List[pd.DataFrame], column_names: List[str],conversion:str) -> List[pd.DataFrame]:
+        if conversion == 'string':        
+            for df in dfs:
+                df= self.convert_columns_to_string(df, column_names)
+        elif conversion == 'numeric':
+            for df in dfs:
+                df= self.convert_columns_to_numeric(df, column_names)
+        elif conversion == 'int':
+            for df in dfs:
+                df= self.convert_columns_to_int(df, column_names)
+        elif conversion == 'date':
+            for df in dfs:
+                df= self.convert_columns_to_date(df, column_names)
+        return dfs
+############################################################################################################
+    def download_files(self,dfs: List[Tuple[pd.DataFrame, str]], title) -> None:
+        for df,name in dfs:
+            filename = f"{title}{name}.xlsx"
+            df.to_excel(filename, index=False)
+        return dfs
 ############################################################################################################
     def create_excel_file(self, data:list[BaseModel]) -> BytesIO:
         """
