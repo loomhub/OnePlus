@@ -10,6 +10,7 @@ from ..models.transactionstmp_model import transactionstmpModel
 from ..models.transactions_model import transactionsModel
 from ..models.rules_model import rulesModel
 from ..models.bankdownloads_model import bankdownloadsModel
+from ..models.cashflows_model import cashflowsModel
 
 # DEFINITIONS
 get_pkey="/transactionstmp/pkey"
@@ -17,7 +18,9 @@ get_all=post_all="/transactionstmp"
 search="/transactionstmp/search"
 send_transaction_report="/transactionstmp/email"
 del_all = "/transactionstmpdel"
+truncate="/transactionstmptruncate"
 apply_rules = "/applyrules"
+period_close = "/periodclosetmp"
 myObjects="transactions"
 get_response_model=transactionsListDTO
 get_pkey_model = transactionDTO
@@ -25,6 +28,7 @@ del_response_model=transactionsDelListDTO
 historyModel=transactionsModel
 newDataModel=bankdownloadsModel
 myModel=transactionstmpModel
+cashModel=cashflowsModel
 myDTO=transactionDTO
 rulesDataModel=rulesModel
 
@@ -128,6 +132,7 @@ async def search_records(
                         'min_amount': query_params.min_amount,
                         'max_amount': query_params.max_amount,
                         'classification': query_params.classification,
+                        'period_status': query_params.period_status,
                         'transaction_group': query_params.transaction_group,
                         'transaction_type': query_params.transaction_type,
                         'description': query_params.description,
@@ -186,6 +191,22 @@ async def delete_record(input_data: del_response_model, db: AsyncSession = Depen
             raise HTTPException(status_code=400, detail=str(e))
     return results
 ############################################################################################################
+@router.delete(
+        truncate,
+        summary="Truncate table",
+        description="Truncate table",
+        tags=["Truncate"],
+        )
+async def truncate_table(db: AsyncSession = Depends(get_session)):
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
+       
+    try:
+        deleted = await my_service.truncate_records(myModel)
+    except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    return deleted
+############################################################################################################
 @router.post(
         apply_rules,
         summary="Apply business rules",
@@ -201,8 +222,7 @@ async def apply_rules(
     my_service = transactiontmpService(my_repository)
 
     resultTransList,errorTransList = await my_service.apply_rules( input_data.transactions,myModel,
-                                                myDTO,historyModel,newDataModel,rulesDataModel,
-                                                query_params.start_date,query_params.end_date)
+                                                myDTO,historyModel,newDataModel,rulesDataModel)
     if errorTransList:
         return errorTransList
     else:
@@ -212,18 +232,30 @@ async def apply_rules(
     else:
          return resultsList  
 ############################################################################################################
-# @router.post(
-#         ml,
-#         summary="Apply machine learning model",
-#         description="Store machine learning results in database",
-#         tags=["ML"],
-#         )
-# async def machine_learn(query_params: transactionSearchQuery = Depends(),
-#                         db: AsyncSession = Depends(get_session)):
+@router.post(
+        period_close,
+        summary="Period Close",
+        description="Close period and store data in database",
+        tags=["Period Close"],
+        )
+async def close_period(
+     query_params: transactionSearchQuery = Depends(),
+     db: AsyncSession = Depends(get_session)):
 
-#     my_repository = transactiontmpRepository(db)
-#     my_service = transactiontmpService(my_repository)
+    my_repository = transactiontmpRepository(db)
+    my_service = transactiontmpService(my_repository)
 
-#     resultsList = await my_service.machine_learn(myModel,historyModel,newDataModel,
-#                                                  query_params.start_date,query_params.end_date,myObjects)
-#     return resultsList  
+    resultTransList,errorTransList = await my_service.period_close(historyModel,myModel,cashModel,myDTO)
+    if errorTransList:
+        return errorTransList
+    else:
+        resultsList,errorsList = await my_service.post_data(resultTransList, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
+############################################################################################################
+
+
+
+

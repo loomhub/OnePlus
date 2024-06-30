@@ -8,11 +8,14 @@ from ..repositories.transaction_repository import transactionRepository
 from ..services.transaction_service import transactionService
 from ..services.transaction_filehandler import transactionFileHandler
 from ..models.transactions_model import transactionsModel
+from ..models.transactionstmp_model import transactionstmpModel
+from ..models.cashflows_model import cashflowsModel
 
 # DEFINITIONS
 get_pkey="/transactions/pkey"
 get_all=post_all="/transactions"
 search="/transactions/search"
+period_close = "/periodclose"
 send_transaction_report="/transactions/email"
 del_all = "/transactionsdel"
 excel_upload = "/transactionsxl"
@@ -21,6 +24,9 @@ get_response_model=transactionsListDTO
 get_pkey_model = transactionDTO
 del_response_model=transactionsDelListDTO
 myModel=transactionsModel
+transtmpModel=transactionstmpModel
+cashModel=cashflowsModel
+myDTO=transactionDTO
 
 router = APIRouter()
 
@@ -202,4 +208,27 @@ async def delete_record(input_data: del_response_model, db: AsyncSession = Depen
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return results
+############################################################################################################
+@router.post(
+        period_close,
+        summary="Period Close",
+        description="Close period and store data in database",
+        tags=["Period Close"],
+        )
+async def close_period(
+     query_params: transactionSearchQuery = Depends(),
+     db: AsyncSession = Depends(get_session)):
+
+    my_repository = transactionRepository(db)
+    my_service = transactionService(my_repository)
+
+    resultTransList,errorTransList = await my_service.period_close(myModel,transtmpModel,cashModel,myDTO)
+    if errorTransList:
+        return errorTransList
+    else:
+        resultsList,errorsList = await my_service.post_data(resultTransList, myModel, query_params.update,myObjects)
+    if errorsList:
+         return errorsList
+    else:
+         return resultsList  
 ############################################################################################################

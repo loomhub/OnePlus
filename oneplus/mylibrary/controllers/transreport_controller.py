@@ -1,26 +1,34 @@
 
-from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
+from typing import List
+from fastapi import APIRouter, File, HTTPException, Depends
+from pydantic import BaseModel, create_model
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dtos.balance_dto import balanceQueryPrimaryKey, balanceQueryUpdateFlag,balancesListDTO, balancesDelListDTO, balanceDTO
+from ..dtos.transreport_dto import reportDTO, transreportQueryPrimaryKey, transreportQueryUpdateFlag,transreportsListDTO, transreportsDelListDTO, transreportDTO
+from ..dtos.transreport_dto import reportQuery,reportListDTO
 from ..dtos.service_dto import QueryEmail
 from ..database.db import get_session
-from ..repositories.balance_repository import balanceRepository
-from ..services.balance_service import balanceService
-from ..services.balance_filehandler import balanceFileHandler
-from ..models.balances_model import balancesModel
-import logging
+from ..repositories.transreport_repository import transreportRepository
+from ..services.transreport_service import transreportService
+from ..models.transreports_model import transreportModel
+from ..models.transactions_model import transactionsModel
+from ..models.cashflows_model import cashflowsModel
+
 
 # DEFINITIONS
-get_pkey="/balances/pkey"
-get_all=post_all="/balances"
-send_balance_report="/balances/email"
-del_all = "/balancesdel"
-excel_upload = "/balancesxl"
-myObjects="balances"
-get_response_model=balancesListDTO
-get_pkey_model = balanceDTO
-del_response_model=balancesDelListDTO
-myModel=balancesModel
+get_pkey="/transreports/pkey"
+get_all=post_all="/transreports"
+send_transreport_report="/transreports/email"
+del_all = "/transreportsdel"
+excel_upload = "/transreportsxl"
+myObjects="transreports"
+perfsummary="/perfsummary"
+perfObject="performance"
+get_response_model=transreportsListDTO
+get_pkey_model = transreportDTO
+del_response_model=transreportsDelListDTO
+myModel=transreportModel
+summary_model=reportListDTO
+summary_DTO=reportDTO
 
 router = APIRouter()
 
@@ -35,8 +43,8 @@ router = APIRouter()
         )
 
 async def get_all_records(db: AsyncSession = Depends(get_session)):
-    my_repository = balanceRepository(db)
-    my_service = balanceService(my_repository)
+    my_repository = transreportRepository(db)
+    my_service = transreportService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
     except Exception as e:
@@ -45,20 +53,20 @@ async def get_all_records(db: AsyncSession = Depends(get_session)):
 
 ############################################################################################################
 @router.get(
-        send_balance_report,
-        summary="Send balance report to email",
-        description="Send balance report to email",
+        send_transreport_report,
+        summary="Send transreport report to email",
+        description="Send transreport report to email",
         status_code=200,
         response_model=get_response_model,
         tags=["Get"],
         )
 
-async def send_balance_report(
+async def send_transreport_report(
      query_params: QueryEmail = Depends(),
      db: AsyncSession = Depends(get_session)
      ):
-    my_repository = balanceRepository(db)
-    my_service = balanceService(my_repository)
+    my_repository = transreportRepository(db)
+    my_service = transreportService(my_repository)
     try:
         results = await my_service.extract_all(myModel)
         sent = await my_service.check_keyword_and_send_email(results,
@@ -82,14 +90,13 @@ async def send_balance_report(
         )
 
 async def get_record_by_pkey(
-    query_params: balanceQueryPrimaryKey = Depends(),
+    query_params: transreportQueryPrimaryKey = Depends(),
     db: AsyncSession = Depends(get_session)
     ):
-    my_repository = balanceRepository(db)
-    my_service = balanceService(my_repository)
+    my_repository = transreportRepository(db)
+    my_service = transreportService(my_repository)
     try:
-        key_fields = {'bank_account_key': query_params.bank_account_key,
-                      'snapshot': query_params.snapshot}  # Adjust according to actual key fields
+        key_fields = {'sequence_id': query_params.sequence_id}  # Adjust according to actual key fields
         result = await my_service.extract_pkey(myModel,key_fields)
         if result is None:
             return {}
@@ -106,43 +113,19 @@ async def get_record_by_pkey(
         )
 async def create_or_update_data(
      input_data: get_response_model,
-     query_params: balanceQueryUpdateFlag = Depends(),
+     query_params: transreportQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)):
 
-    my_repository = balanceRepository(db)
-    my_service = balanceService(my_repository)
+    my_repository = transreportRepository(db)
+    my_service = transreportService(my_repository)
 
-    resultsList,errorsList = await my_service.post_data(input_data.balances, myModel, query_params.update,myObjects)
+    resultsList,errorsList = await my_service.post_data(input_data.transreports, myModel, query_params.update,myObjects)
     if errorsList:
          return errorsList
     else:
          return resultsList  
     
 ############################################################################################################
-
-@router.post(excel_upload, summary="Upload and save balances data from a CSV file")
-async def upload_and_upsert_records(
-    file: UploadFile = File(...),
-    query_params: balanceQueryUpdateFlag = Depends(),
-    db: AsyncSession = Depends(get_session)
-                                   ):
-    
-    my_repository = balanceRepository(db)
-    my_service = balanceService(my_repository)
-
-    my_filehandler = balanceFileHandler(file)
-    input_data, errorsList = my_filehandler.extract_data_from_file()
-    
-    if errorsList:
-        return errorsList
-
-    resultsList,errorsList = await my_service.post_data(input_data.balances, myModel, query_params.update,myObjects)
-    if errorsList:
-         return errorsList
-    else:
-         return resultsList  
-############################################################################################################
-
 @router.delete(
         del_all,
         summary="Delete multiple record",
@@ -150,16 +133,39 @@ async def upload_and_upsert_records(
         tags=["Delete"],
         )
 async def delete_record(input_data: del_response_model, db: AsyncSession = Depends(get_session)):
-    my_repository = balanceRepository(db)
-    my_service = balanceService(my_repository)
+    my_repository = transreportRepository(db)
+    my_service = transreportService(my_repository)
     results = []
-    for record in input_data.balancesDel:   
+    for record in input_data.transreportsDel:   
         try:
-            key_fields = {'bank_account_key': record.bank_account_key,
-                      'snapshot': record.snapshot}  # Adjust according to actual key fields
+            key_fields = {'sequence_id': record.sequence_id}  # Adjust according to actual key fields
             deleted,result = await my_service.delete_records(record, myModel, key_fields)
             results.append( {"deleted": deleted,myObjects: result} )
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return results
 ############################################################################################################
+@router.get(
+        perfsummary,
+        summary="Get performance summary report",
+        description="Get performance summary report from database",
+        status_code=200,
+    #    response_model=summary_model,
+        tags=["Get"],
+        )
+
+async def performance_summary(
+    query_params: reportQuery = Depends(),
+    db: AsyncSession = Depends(get_session)
+    ):
+    my_repository = transreportRepository(db)
+    my_service = transreportService(my_repository)
+    try:
+        result = await my_service.summarize_performance(myModel,transactionsModel,cashflowsModel,
+                                                        bank_account_key=query_params.bank_account_key,
+                                                        years=query_params.years)
+        if result is None:
+            return {}
+        return result
+    except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))

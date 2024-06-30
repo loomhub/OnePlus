@@ -9,7 +9,8 @@ from io import BytesIO
 import smtplib
 from typing import BinaryIO, List, Optional, Tuple, Type, TypeVar,Dict
 import pandas as pd
-from pydantic import BaseModel
+from sqlalchemy.orm import class_mapper
+from pydantic import BaseModel, ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 from ..dtos.service_dto import processedDTO, listProcessedDTO
 from ..models.emailConfig_model import emailsConfigModel
@@ -54,7 +55,7 @@ class MyService:
     ############################################################################################################
     async def search_records(self,model: Type[BaseModel],search_fields: dict) -> Optional[list]:
         try:
-            result = await self.repository.retrieve_search_records(model, search_fields)
+            result = await self.repository.retrieve_unique_record(model, search_fields,multiple='X')
             if result is None:
                 print("Record not found")
             return result
@@ -128,6 +129,17 @@ class MyService:
                await self.repository.rollback_changes()
                raise Exception(f"Database error: {str(e)}")
     
+    ############################################################################################################
+    # Truncate table
+    async def truncate_records(self, model: Type[BaseModel]) -> bool:
+        try:
+            await self.repository.truncate_table(model)
+            await self.repository.commit_changes()
+            return True
+        except Exception as e:
+            await self.repository.rollback_changes()
+            raise Exception(f"Database error: {str(e)}")
+     
     ############################################################################################################    
     async def validate_data(self, records:List[Type[BaseModel]], fkey_checks: Dict[Type[BaseModel], str]) -> List[str]:
         errors = []
@@ -186,20 +198,30 @@ class MyService:
         for column_name in column_names:
             if column_name in df.columns:
                 if not pd.api.types.is_datetime64_any_dtype(df[column_name]):
+                    df[column_name] = df[column_name].astype(str)
                     # Apply the date parsing method and handle NaN values after conversion
                     df[column_name] = df[column_name].apply(self.parse_date)
                     # Replace NaT with a default date and ensure all operations are on datetime format
                     df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
                     df[column_name] = pd.to_datetime(df[column_name]).dt.normalize()
-                    # Convert datetime to date (optional: remove if you prefer datetime objects)
-                    #df[column_name] = df[column_name].dt.date
-                    # Format the date as a string in the desired format
-                    #df[column_name] = df[column_name].apply(self.format_date) 
             else:
                 print(f"Column {column_name} not found in DataFrame.")
         
         return df
 ############################################################################################################  
+    def convert_columns_to_datetime_to_date(self,
+                        df: pd.DataFrame,
+                        column_names: List[str],
+                        **kwargs) -> pd.DataFrame:
+        for column_name in column_names:
+            if column_name in df.columns:
+                df[column_name] = pd.to_datetime(df[column_name], errors='coerce').dt.date
+            else:
+                print(f"Column {column_name} not found in DataFrame.")
+        
+        return df
+
+#############################################################################################################
     def convert_columns_to_string(self, 
                         df: pd.DataFrame, 
                         column_names: List[str],**kwargs) -> pd.DataFrame:
@@ -249,16 +271,24 @@ class MyService:
     def convert_dataframe_columns(self,dfs: List[pd.DataFrame], column_names: List[str],conversion:str) -> List[pd.DataFrame]:
         if conversion == 'string':        
             for df in dfs:
-                df= self.convert_columns_to_string(df, column_names)
+                if df.empty == False:
+                    df= self.convert_columns_to_string(df, column_names)
         elif conversion == 'numeric':
             for df in dfs:
-                df= self.convert_columns_to_numeric(df, column_names)
+                if df.empty == False:
+                    df= self.convert_columns_to_numeric(df, column_names)
         elif conversion == 'int':
             for df in dfs:
-                df= self.convert_columns_to_int(df, column_names)
+                if df.empty == False:
+                    df= self.convert_columns_to_int(df, column_names)
         elif conversion == 'date':
             for df in dfs:
-                df= self.convert_columns_to_date(df, column_names)
+                if df.empty == False:
+                    df= self.convert_columns_to_date(df, column_names)
+        elif conversion == 'datetime_to_date':
+            for df in dfs:
+                if df.empty == False:
+                    df= self.convert_columns_to_datetime_to_date(df, column_names)
         return dfs
 ############################################################################################################
     def download_files(self,dfs: List[Tuple[pd.DataFrame, str]], title) -> None:
@@ -267,6 +297,58 @@ class MyService:
             df.to_excel(filename, index=False)
         return dfs
 ############################################################################################################
+    def convert_dataframe_to_list_dto(
+            self,
+            df: pd.DataFrame, #pandas.DataFrame containing the data.
+            dto_class: Type[BaseModel] #The DTO class to which rows will be converted.
+            )  -> Tuple[List[BaseModel],List[str]]: #Return a list of DTO instances.
+    
+        # Get the fields of the dto_class
+        dto_fields = list(dto_class.__fields__.keys())
+
+        # Filter the DataFrame to only include columns that exist in dto_fields
+        df_filtered = df[dto_fields]
+
+        dto_list = []
+        error_list = []
+
+        for index, row in df_filtered.iterrows():
+            try:
+                dto_instance = dto_class(**row.to_dict())  # Use dictionary unpacking to initialize the DTO from a row.
+                dto_list.append(dto_instance)
+            except ValidationError as e:
+                error_message = f"Error occurred at row index {index}: {e}"
+                error_list.append(error_message)
+                print(error_message)
+
+        print(type(dto_list))
+
+        return dto_list, error_list
+
+############################################################################################################
+    def sqlalchemy_model_to_dict(self,model):
+    #Convert SQLAlchemy model instance to dictionary."
+        return {column.key: getattr(model, column.key) for column in class_mapper(model.__class__).columns}
+#############################################################################################################    
+    def models_to_dataframe(self,models: List[BaseModel]) -> pd.DataFrame:
+        # Convert list of Pydantic models to list of dictionaries
+        data = [self.sqlalchemy_model_to_dict(model) for model in models]
+        # Create DataFrame from list of dictionaries
+        df = pd.DataFrame(data)
+        return df
+############################################################################################################
+    async def load_data(self, *models: Type[BaseModel]):
+        dataframes = []
+        for model in models:
+            data = await self.repository.retrieve_all(model)
+            if data:
+                df = self.models_to_dataframe(data)
+                dataframes.append(df)  # Append dataframe to list
+            else:
+                dataframes.append(pd.DataFrame())  # Append an empty dataframe if no data
+        return dataframes
+############################################################################################################
+
     def create_excel_file(self, data:list[BaseModel]) -> BytesIO:
         """
         Creates Excel file.
@@ -465,4 +547,97 @@ class MyService:
                 
             except Exception as e:
                 raise Exception(f"Email send error: {str(e)}")
+############################################################################################################
+    def set_dates(self, tdate):
+        start_date = tdate.replace(day=1).date()
+        end_date = (start_date + pd.DateOffset(months=1) - pd.DateOffset(days=1)).normalize().date()
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        return start_date_str, end_date_str, end_date
+
+############################################################################################################
+    def perform_period_close(self,historyDF, transtmpDF, cashDF):
+        resultsDF=pd.DataFrame()
+        startDatesDF = historyDF.groupby('bank_account_key')['tdate'].max().reset_index()
+        
+        # Loop over each row in startDatesDF
+        for _, row in startDatesDF.iterrows():
+            flag = 'closed'
+            start_date_str, end_date_str, end_date = self.set_dates(row['tdate'])
+
+            while flag == 'closed':
+                # Read cashflowDF with the specified conditions
+                cashflow_cond = (cashDF['bank_account_key'] == row['bank_account_key']) &\
+                                (cashDF['start_date'] == start_date_str) &\
+                                (cashDF['end_date'] == end_date_str) &\
+                                (cashDF['period_status'] == 'closed')
+                cashflow_subset = cashDF[cashflow_cond]
+
+                if not cashflow_subset.empty:
+                    # Read transactionstmpDF with the specified conditions
+                    transactions_cond = (transtmpDF['bank_account_key'] == row['bank_account_key']) &\
+                                        (transtmpDF['tdate'] >= start_date_str) & \
+                                        (transtmpDF['tdate'] <= end_date_str)
+                    transactions_subset = transtmpDF[transactions_cond]
+
+                    if not transactions_subset.empty:
+
+                        # Check if all rows in the transactions_subset have classification = 'clean'
+                        if (transactions_subset['classification'] == 'clean').all():
+                            # Set period_status = closed for these rows
+                            transactions_subset['period_status'] = 'closed'
+                            # Append these rows to resultsDF
+                            resultsDF = pd.concat([resultsDF, transactions_subset])
+                        else:
+                            flag = 'open'
+                else:
+                    flag = 'open'
+                # Move to the next month
+                start_date = (pd.Timestamp(end_date) + pd.DateOffset(days=1)).normalize()
+                start_date_str,end_date_str,end_date = self.set_dates(start_date)
+                
+        return resultsDF
+            
+############################################################################################################
+    async def period_close(self, historyModel: Type[BaseModel], transactionstmpModel: Type[BaseModel],
+                                 cashflowsModel: Type[BaseModel], outputDTO: Type[BaseModel]) :
+        
+        pkey=['bank_account_key', 'tdate', 'description', 'amount']
+
+        #Step 1 Load Dataframes 
+        historyDF, transtmpDF,cashDF = await self.load_data(historyModel,transactionstmpModel,cashflowsModel) # Load data from database
+        
+        #Step 2 Convert columns to appropriate data types
+        historyDF, transtmpDF = self.convert_dataframe_columns([historyDF, transtmpDF],
+                                                                             ['bank_account_key','tdate','description',
+                                                                              'classification','period_status',
+                                                                              'transaction_group','transaction_type',
+                                                                              'vendor','customer','comments',
+                                                                              'vendor_no_w9','customer_no_w9'],
+                                                                             'string')
+        historyDF, transtmpDF = self.convert_dataframe_columns([historyDF, transtmpDF],
+                                                                             ['tdate'],
+                                                                             'date')
+        historyDF, transtmpDF = self.convert_dataframe_columns([historyDF, transtmpDF],
+                                                                             ['amount'],
+                                                                             'numeric')
+        cashlist = self.convert_dataframe_columns([cashDF],['bank_account_key','start_date','end_date','period_status'],
+                                                                             'string')
+        cashDF = cashlist[0]
+        
+        cashlist = self.convert_dataframe_columns([cashDF],['start_date','end_date'],'date')
+        cashDF = cashlist[0]
+
+        cashlist = self.convert_dataframe_columns([cashDF],['cash_change','ending_balance','calc_balance'],
+                                                                             'numeric')
+        cashDF = cashlist[0]
+
+        #Step 3 Perform period close
+        resultsDF = self.perform_period_close(historyDF, transtmpDF, cashDF)
+    #    self.download_files([(historyDF,'Transactions'),(transtmpDF,'Transactionstmp'),(cashDF,'Cashflows')],'STEP2')
+
+        #Step 4 Convert DataFrame to ListDTO
+        newDataList, errorList = self.convert_dataframe_to_list_dto(resultsDF, outputDTO)
+        return newDataList, errorList
+
                 

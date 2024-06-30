@@ -13,7 +13,9 @@ from mylibrary.controllers.transaction_controller import router as transaction_r
 from mylibrary.controllers.transactiontmp_controller import router as transactiontmp_router
 from mylibrary.controllers.rule_controller import router as rule_router
 from mylibrary.controllers.bankdownload_controller import router as bankdownload_router
+from mylibrary.controllers.transreport_controller import router as transreport_router
 from mylibrary.controllers.file_upload_download_controller import router as upload_download_router
+
 
 from mylibrary.database.db import Base, sync_engine
 
@@ -25,13 +27,13 @@ app.include_router(propertyMaster_router)
 app.include_router(bankaccount_router)
 app.include_router(cashflow_router)
 app.include_router(partner_router)
-#app.include_router(customer_router)
 app.include_router(tenant_router)
 app.include_router(transactionType_router)
 app.include_router(transaction_router)
 app.include_router(transactiontmp_router)
 app.include_router(rule_router)
 app.include_router(bankdownload_router)
+app.include_router(transreport_router)
 app.include_router(upload_download_router)
 
 

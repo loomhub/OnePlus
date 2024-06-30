@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta
 import logging
-from typing import Dict, List, Tuple, Type
+from typing import List,Type
 from fastapi import HTTPException
 import pandas as pd
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel
 from ..models.bankaccounts_model import bankaccountsModel
 from ..models.transaction_types_model import transactionTypesModel
 from ..models.partners_model import partnersModel
-from sqlalchemy.orm import class_mapper
+
 # from sklearn.ensemble import RandomForestClassifier
 # from sklearn.model_selection import train_test_split
 # from sklearn.preprocessing import LabelEncoder
@@ -55,69 +55,6 @@ class transactiontmpService(MyService):
 
             return results, errors
 ############################################################################################################
-    def convert_dataframe_to_list_dto(
-            self,
-            df: pd.DataFrame, #pandas.DataFrame containing the data.
-            dto_class: Type[BaseModel] #The DTO class to which rows will be converted.
-            )  -> Tuple[List[BaseModel],List[str]]: #Return a list of DTO instances.
-    
-        # Get the fields of the dto_class
-        dto_fields = list(dto_class.__fields__.keys())
-
-        # Filter the DataFrame to only include columns that exist in dto_fields
-        df_filtered = df[dto_fields]
-
-        dto_list = []
-        error_list = []
-
-        for index, row in df_filtered.iterrows():
-            try:
-                dto_instance = dto_class(**row.to_dict())  # Use dictionary unpacking to initialize the DTO from a row.
-                dto_list.append(dto_instance)
-            except ValidationError as e:
-                error_message = f"Error occurred at row index {index}: {e}"
-                error_list.append(error_message)
-                print(error_message)
-
-        print(type(dto_list))
-
-        return dto_list, error_list
-
-############################################################################################################
-    def sqlalchemy_model_to_dict(self,model):
-    #Convert SQLAlchemy model instance to dictionary."
-        return {column.key: getattr(model, column.key) for column in class_mapper(model.__class__).columns}
-#############################################################################################################    
-    def models_to_dataframe(self,models: List[BaseModel]) -> pd.DataFrame:
-        # Convert list of Pydantic models to list of dictionaries
-        data = [self.sqlalchemy_model_to_dict(model) for model in models]
-        # Create DataFrame from list of dictionaries
-        df = pd.DataFrame(data)
-        return df
-############################################################################################################
-    async def load_data(self, *models: Type[BaseModel]):
-        dataframes = []
-        for model in models:
-            data = await self.repository.retrieve_all(model)
-            df = self.models_to_dataframe(data)
-            dataframes.append(df)
-        return dataframes
-############################################################################################################
-    # async def load_data(self, historyModel: Type[BaseModel], 
-    #                     newDataModel: Type[BaseModel],
-    #                     rulesModel: Type[BaseModel]):
-        
-    #     history = await self.repository.retrieve_all(historyModel)
-    #     historyDF = self.models_to_dataframe(history)
-
-    #     newData = await self.repository.retrieve_all(newDataModel)
-    #     newDataDF = self.models_to_dataframe(newData)
-
-    #     rulesData = await self.repository.retrieve_all(rulesModel)
-    #     rulesDF = self.models_to_dataframe(rulesData)
-
-    #     return historyDF, newDataDF, rulesDF
-############################################################################################################
     def filter_data(self,historyDF,newDataDF, columns_to_check,start_date,end_date):
 
         merged_df = newDataDF.merge(historyDF, on=columns_to_check, how='left', indicator=True)
@@ -141,10 +78,13 @@ class transactiontmpService(MyService):
         return newDataDF_filtered
 ############################################################################################################
     def credit_debit_rule(self, df):
-        df.loc[df['amount'] <= 0,
-                ['customer', 'customer_no_w9']] = df.loc[df['amount'] < 0, 'bank_account_key'].apply(lambda x: [x, x]).to_list()
-        df.loc[df['amount'] > 0,
-                ['vendor', 'vendor_no_w9']] = df.loc[df['amount'] > 0, 'bank_account_key'].apply(lambda x: [x, x]).to_list()
+        df.loc[(df['amount'] > 0) & (df['classification'] != 'clean'), ['vendor', 'vendor_no_w9']] = df['bank_account_key']
+        df.loc[(df['amount'] <= 0) & (df['classification'] != 'clean'), ['customer', 'customer_no_w9']] = df['bank_account_key']
+
+        # df.loc[(df['classification'] != 'clean') & (df['amount'] <= 0),
+        #         ['customer', 'customer_no_w9']] = df.loc[df['amount'] < 0, 'bank_account_key'].apply(lambda x: [x, x]).to_list()
+        # df.loc[(df['classification'] != 'clean') & (df['amount'] > 0),
+        #         ['vendor', 'vendor_no_w9']] = df.loc[df['amount'] > 0, 'bank_account_key'].apply(lambda x: [x, x]).to_list()
         return df    
 ############################################################################################################
     def apply_business_logic(self, df, rule):
@@ -181,9 +121,45 @@ class transactiontmpService(MyService):
                  print(f"Error occurred at row index {index}: {e}")
         return df
 ############################################################################################################
-    def update_from_records(self, newDataDF: pd.DataFrame, recordsDF: pd.DataFrame,pkey) -> pd.DataFrame:
+    def merge_dataframes(self, df1, df2, pkey, suffixes=('', '_new')):
+        
+        if df2.empty:
+            return df1
+        
+        merged_df = df1.merge(
+            df2, 
+            on=pkey, 
+            suffixes=suffixes
+        )
+        return merged_df
+############################################################################################################
+    def identify_clean_records(self, newDataDF:pd.DataFrame, 
+                               transtmpDF:pd.DataFrame, 
+                               recordsDF:pd.DataFrame, pkey,**kwargs) -> pd.DataFrame:
+        no_update_columns = kwargs.get('no_update', [])
 
-        # Perform the merge to identify rows to update
+        # Perform the merge with the recordsDF
+        merged_df = self.merge_dataframes(newDataDF, recordsDF, pkey, suffixes=('', '_new'))
+        # Identify update_columns
+        update_columns = [col for col in recordsDF.columns if col not in pkey \
+                                  and col != 'id']
+        filtered_update_columns = [col for col in update_columns if col not in no_update_columns]
+
+        for col in filtered_update_columns:
+            col_new = f'{col}_new'
+            if col_new in merged_df.columns:
+                merged_df[col] = merged_df[col_new]
+            else:
+                print(f"Column {col_new} not found in DataFrame")
+                
+                
+        final_columns = pkey + filtered_update_columns
+        merged_df = merged_df[final_columns]
+        return merged_df
+############################################################################################################
+    def update_from_records(self, newDataDF: pd.DataFrame, recordsDF: pd.DataFrame,pkey,**kwargs) -> pd.DataFrame:
+        no_update_columns = kwargs.get('no_update', [])
+        # Perform the merge with the recordsDF
         if not recordsDF.empty:
             merged_df = newDataDF.merge(
                 recordsDF, 
@@ -193,28 +169,29 @@ class transactiontmpService(MyService):
 
             # Update rows in newDataDF where the classification is "clean"
             for index, row in merged_df.iterrows():
-                if pd.notna(row['classification_new']) and row['classification_new'] == 'clean':
-                    condition = (
-                        (newDataDF['bank_account_key'] == row['bank_account_key']) &
-                        (newDataDF['tdate'] == row['tdate']) &
-                        (newDataDF['description'] == row['description']) &
-                        (newDataDF['amount'] == row['amount'])
-                    )
-                    update_columns = [col for col in recordsDF.columns if col not in pkey and col != 'classification_new' and col != 'id']
-                    #update_values = {col: row[f'{col}_new'] for col in update_columns}
-                    update_values = {}
-                    for col in update_columns:
-                        col_new = f'{col}_new'
-                        if col_new in row:
-                            update_values[col] = row[col_new]
-                        else:
-                            print(f"Column {col_new} not found in row")
-                    # Prepare the update values
-                    update_values = {col: row[f'{col}_new'] for col in update_columns}
-
-                    # Ensure the index is correct
-                    newDataDF.loc[condition, update_columns] = pd.DataFrame([update_values], index=newDataDF.loc[condition].index)
-
+#                if pd.notna(row['classification_new']) and row['classification_new'] == 'clean':
+                condition = (
+                    (newDataDF['bank_account_key'] == row['bank_account_key']) &
+                    (newDataDF['tdate'] == row['tdate']) &
+                    (newDataDF['description'] == row['description']) &
+                    (newDataDF['amount'] == row['amount'])
+                )
+                update_columns = [col for col in recordsDF.columns if col not in pkey \
+                                  and col != 'id']
+                             #     and col != 'classification_new' and col != 'id']
+                filtered_update_columns = [col for col in update_columns if col not in no_update_columns]
+                #update_values = {col: row[f'{col}_new'] for col in update_columns}
+                update_values = {}
+                for col in filtered_update_columns:
+                    col_new = f'{col}_new'
+                    if col_new in row:
+                        update_values[col] = row[col_new]
+                    else:
+                        print(f"Column {col_new} not found in row")
+                # Prepare the update values
+                update_values = {col: row[f'{col}_new'] for col in filtered_update_columns}
+                # Ensure the index is correct
+                newDataDF.loc[condition, filtered_update_columns] = pd.DataFrame([update_values], index=newDataDF.loc[condition].index)
         return newDataDF
 ############################################################################################################
     def initialize_data(self, df):
@@ -224,8 +201,10 @@ class transactiontmpService(MyService):
         df.loc[:, 'transaction_type'] = 'Review'
         df.loc[:, 'vendor'] = 'GeneralVendor'
         df.loc[:, 'customer'] = 'GeneralCustomer'
-        df.loc[df['period_status'].isnull(), 'period_status'] = 'open'
-        df.loc[df['classification'].isnull(), 'classification'] = 'review'
+        df.loc[:, 'classification'] = 'review'
+        df.loc[:, 'period_status'] = 'open'
+    #    df.loc[df['period_status'].isnull(), 'period_status'] = 'open'
+    #    df.loc[df['classification'].isnull(), 'classification'] = 'review'
         return df
 ############################################################################################################
     def set_date_range(self, start_date, end_date, df):
@@ -235,23 +214,30 @@ class transactiontmpService(MyService):
             end_date = (datetime.now() + timedelta(days=1))
         return start_date, end_date
 ############################################################################################################
+    def filter_dates(self, newDataDF, historyDF):
+        if newDataDF.empty:
+            return newDataDF
+        startDatesDF = historyDF.groupby('bank_account_key')['tdate'].max().reset_index()
+        newDataDF = newDataDF.merge(startDatesDF, on='bank_account_key', how='left', suffixes=('', '_max'))
+        newDataDF = newDataDF[newDataDF['tdate'] > newDataDF['tdate_max']]
+        newDataDF.drop(columns=['tdate_max'], inplace=True)
+        return newDataDF
+############################################################################################################
     async def apply_rules(self, 
                             records:List[Type[BaseModel]], 
                             myModel: Type[BaseModel], 
                             outputDTO: Type[BaseModel], 
                             historyModel: Type[BaseModel], 
                             newDataModel: Type[BaseModel], 
-                            rulesModel: Type[BaseModel],
-                            start_date: str,
-                            end_date: str):
+                            rulesModel: Type[BaseModel]):
         
         
         pkey=['bank_account_key', 'tdate', 'description', 'amount']
-        #Step 1 Load Dataframes
+        #Step 1 Load Dataframes myDF = transactionstmp, historyDF = Transactions,
+        # newDataDF = BankDownloadsData, recordsDF = PostData from user
         myDF,historyDF, newDataDF,rulesDF = await self.load_data(myModel,historyModel, newDataModel,rulesModel) # Load data from database
         records_df = pd.DataFrame([record.dict() for record in records])
-
-        start_date, end_date = self.set_date_range(start_date, end_date, historyDF)
+        records_df = records_df[records_df['amount'] != 0]
 
         #Step 2 Convert columns to appropriate data types
         myDF,historyDF,newDataDF,records_df = self.convert_dataframe_columns([myDF,historyDF,newDataDF,records_df],
@@ -263,23 +249,31 @@ class transactiontmpService(MyService):
         myDF,historyDF,newDataDF,records_df = self.convert_dataframe_columns([myDF,historyDF,newDataDF,records_df],
                                                                              ['amount'],
                                                                              'numeric')
-        self.download_files([(myDF,'Transactionstmp'),(historyDF,'Transactions'),(newDataDF,'IncomingData'),(records_df,'PostData')],'STEP2')
+    #    self.download_files([(myDF,'Transactionstmp'),(historyDF,'Transactions'),(newDataDF,'IncomingData'),(records_df,'PostData')],'STEP2')
 
         #Step 3 Filter incoming data to keep transactions within the date range
-        newDataDF=self.filter_data(historyDF,newDataDF,pkey,start_date,end_date)
+        newDataDF=self.filter_dates(newDataDF,historyDF)
+        records_df=self.filter_dates(records_df,historyDF)
+        myDF=self.filter_dates(myDF,historyDF)
+        
+#        newDataDF=self.filter_data(historyDF,newDataDF,pkey,start_date,end_date)
         self.download_files([(newDataDF,'IncomingData')],'STEP3')
 
         #Step 4 Initialize Data
         newDataDF = self.initialize_data(newDataDF)
         self.download_files([(newDataDF,'IncomingData')],'STEP4')
 
+        # STEP 5 Filter records with classification = 'clean'
+        newDataDF = self.identify_clean_records(newDataDF, myDF, records_df, pkey)
+        self.download_files([(newDataDF,'IncomingData')],'STEP5')
+
         #Step 5A Update incoming data with transactionstmp
-        newDataDF = self.update_from_records(newDataDF, myDF,pkey)
-        self.download_files([(newDataDF,'IncomingData')],'STEP5A')
+    #    newDataDF = self.update_from_records(newDataDF, myDF,pkey)
+    #    self.download_files([(newDataDF,'IncomingData')],'STEP5A')
 
          #Step 5B Update incoming data with post data records
-        newDataDF = self.update_from_records(newDataDF, records_df,pkey)
-        self.download_files([(newDataDF,'IncomingData')],'STEP5B')
+        #newDataDF = self.update_from_records(newDataDF, records_df,pkey,no_update=['period_status'])
+        
         
         #Step 6 Apply Business Rules
         newDataDF = self.apply_business_rules(newDataDF,rulesDF)
@@ -288,6 +282,61 @@ class transactiontmpService(MyService):
         #Step 7 Convert DataFrame to ListDTO
         newDataList, errorList = self.convert_dataframe_to_list_dto(newDataDF, outputDTO)
         return newDataList, errorList
+############################################################################################################
+    # async def apply_rules(self, 
+    #                         records:List[Type[BaseModel]], 
+    #                         myModel: Type[BaseModel], 
+    #                         outputDTO: Type[BaseModel], 
+    #                         historyModel: Type[BaseModel], 
+    #                         newDataModel: Type[BaseModel], 
+    #                         rulesModel: Type[BaseModel],
+    #                         start_date: str,
+    #                         end_date: str):
+        
+        
+    #     pkey=['bank_account_key', 'tdate', 'description', 'amount']
+    #     #Step 1 Load Dataframes myDF = transactionstmp, historyDF = Transactions,
+    #     # newDataDF = BankDownloadsData, recordsDF = PostData from user
+    #     myDF,historyDF, newDataDF,rulesDF = await self.load_data(myModel,historyModel, newDataModel,rulesModel) # Load data from database
+    #     records_df = pd.DataFrame([record.dict() for record in records])
+
+    #     start_date, end_date = self.set_date_range(start_date, end_date, historyDF)
+
+    #     #Step 2 Convert columns to appropriate data types
+    #     myDF,historyDF,newDataDF,records_df = self.convert_dataframe_columns([myDF,historyDF,newDataDF,records_df],
+    #                                                                          ['bank_account_key','tdate','description'],
+    #                                                                          'string')
+    #     myDF,historyDF,newDataDF,records_df = self.convert_dataframe_columns([myDF,historyDF,newDataDF,records_df],
+    #                                                                          ['tdate'],
+    #                                                                          'date')
+    #     myDF,historyDF,newDataDF,records_df = self.convert_dataframe_columns([myDF,historyDF,newDataDF,records_df],
+    #                                                                          ['amount'],
+    #                                                                          'numeric')
+    #     self.download_files([(myDF,'Transactionstmp'),(historyDF,'Transactions'),(newDataDF,'IncomingData'),(records_df,'PostData')],'STEP2')
+
+    #     #Step 3 Filter incoming data to keep transactions within the date range
+    #     newDataDF=self.filter_data(historyDF,newDataDF,pkey,start_date,end_date)
+    #     self.download_files([(newDataDF,'IncomingData')],'STEP3')
+
+    #     #Step 4 Initialize Data
+    #     newDataDF = self.initialize_data(newDataDF)
+    #     self.download_files([(newDataDF,'IncomingData')],'STEP4')
+
+    #     #Step 5A Update incoming data with transactionstmp
+    #     newDataDF = self.update_from_records(newDataDF, myDF,pkey)
+    #     self.download_files([(newDataDF,'IncomingData')],'STEP5A')
+
+    #      #Step 5B Update incoming data with post data records
+    #     newDataDF = self.update_from_records(newDataDF, records_df,pkey)
+    #     self.download_files([(newDataDF,'IncomingData')],'STEP5B')
+        
+    #     #Step 6 Apply Business Rules
+    #     newDataDF = self.apply_business_rules(newDataDF,rulesDF)
+    #     self.download_files([(newDataDF,'IncomingData')],'STEP6')
+
+    #     #Step 7 Convert DataFrame to ListDTO
+    #     newDataList, errorList = self.convert_dataframe_to_list_dto(newDataDF, outputDTO)
+    #     return newDataList, errorList
 ############################################################################################################
     # def encode_categorical_data(self, df, columns):
     #     for column in columns:

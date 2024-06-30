@@ -58,6 +58,7 @@ class transactionSearchQuery(BaseModel):
     min_amount: Optional[float] = Field(None, description="Minimum amount for transaction amount range")
     max_amount: Optional[float] = Field(None, description="Maximum amount for transaction amount range")
     classification: Optional[str] = Field(None, description="Classification of the transaction to filter by")
+    period_status : Optional[str] = Field(None, description="Period Status of the transaction to filter by")
     transaction_group: Optional[str] = Field(None, description="Transaction group to filter by")
     transaction_type: Optional[str] = Field(None, description="Transaction type to filter by")
     description: Optional[str] = Field(None, description="Description of the transaction to filter by")

@@ -1,7 +1,14 @@
 1. Run python3 -m venv venv
 2. Run source venv/bin/activate
 
-Alembic Initial Setupo
+Git set up
+
+1. git init [project_name] # Use this only first time
+2. git add \*
+3. git commit -m "Message"
+4. git push
+
+Alembic Initial Setup
 
 1. Run `alembic init alembic` to create an alembic folder
 2. Edit alembic.ini file to add "sqlalchemy.url=postgresql+psycopg2://admin:admin@localhost/oneplusrealtydb"

@@ -1,7 +1,8 @@
 from datetime import date
-from typing import List, Optional, Type
+from typing import Dict, List, Optional, Type
 import pandas as pd
 from pydantic import BaseModel
+from sqlalchemy import extract, func, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -32,7 +33,8 @@ class myRepository:
             async with self.db_session as session:
                 stmt = select(model)
                 for field, value in filters.items():
-                    stmt = stmt.where(getattr(model, field) == value)
+                    if value:
+                        stmt = stmt.where(getattr(model, field) == value)
                 result = await session.execute(stmt)
                 if multiple:
                     return result.scalars().all()
@@ -55,7 +57,7 @@ class myRepository:
         except Exception as e:
             await self.db_session.rollback()
             raise e
-#######    
+#############################################################################################################    
     async def delete_data(self, data_model: Type[BaseModel]) -> bool:
         try:    
             async with self.db_session as session:
@@ -63,6 +65,18 @@ class myRepository:
                 await session.commit()
                 return True
         except Exception as e:
+            await self.db_session.rollback()
+            raise e
+############################################################################################################
+    async def truncate_table(self, data_model: Type[BaseModel]) -> bool:
+        try:    
+            async with self.db_session as session:
+                truncate_stmt = text(f'TRUNCATE TABLE {data_model.__tablename__} RESTART IDENTITY CASCADE;')
+                await session.execute(truncate_stmt)
+                await session.commit()
+                return True
+        except Exception as e:
+            print(f"Error while truncating table {data_model.__tablename__}: {e}")
             await self.db_session.rollback()
             raise e
 ############################################################################################################
@@ -76,4 +90,54 @@ class myRepository:
     async def rollback_changes(self) -> None:
         await self.db_session.rollback()
 ############################################################################################################
-    
+    # async def retrieve_summary_by_month(self, model, key, years, 
+    #                                     keys: Dict[str, str], labels: Dict[str, str], 
+    #                                     filter_values: List[str]):
+    #     # Set years
+    #     if not years:
+    #         years = 2
+    #     end_year = date.today().year
+    #     start_year = end_year - years
+        
+    #     try:
+    #         async with self.db_session as session:
+
+    #             conditions = [
+    #                 getattr(model, keys['filter_column']).in_(filter_values),
+    #                 extract('year', getattr(model, keys['date'])).between(start_year, end_year)
+    #             ]
+                
+    #             if key is not None:
+    #                 conditions.append(getattr(model, keys['key']) == key)
+                
+    #             stmt = (
+    #                 select(
+    #                 getattr(model, keys['key']),
+    #                 extract('year', getattr(model, keys['date'])).label('year'),
+    #                 extract('month', getattr(model, keys['date'])).label('month'),
+    #                 func.sum(getattr(model, labels['amount'])).label(labels['amount'])
+    #         )
+    #         .where(*conditions)
+    #         .group_by(
+    #                     getattr(model, keys['key']),
+    #                     extract('year', getattr(model, keys['date'])),
+    #                     extract('month', getattr(model, keys['date']))
+    #                 )
+    #                 .order_by(
+    #                     getattr(model, keys['key']),
+    #                     extract('year', getattr(model, keys['date'])),
+    #                     extract('month', getattr(model, keys['date']))
+    #                 )
+    #         )
+    #             result = await session.execute(stmt)
+    #             return result.fetchall()
+
+    #     except SQLAlchemyError as e:
+    #         # Handle specific database query errors
+    #             await session.rollback()
+    #             print(f"Database error during record retrieval: {e}")
+    #             return None
+    #     except Exception as e:
+    #         # Handle any other exceptions that may not be related to the database
+    #             print(f"An error occurred: {e}")
+    #             return None

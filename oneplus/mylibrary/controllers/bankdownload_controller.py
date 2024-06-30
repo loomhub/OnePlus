@@ -15,6 +15,7 @@ get_pkey="/bankdownloads/pkey"
 get_all=post_all="/bankdownloads"
 send_bankdownload_report="/bankdownloads/email"
 del_all = "/bankdownloadsdel"
+truncate="/bankdownloadstruncate"
 chase_upload = "/chasexl"
 wellsfargo_upload = "/wellsfargoxl"
 myObjects="bankdownloads"
@@ -198,4 +199,20 @@ async def delete_record(input_data: del_response_model, db: AsyncSession = Depen
         except Exception as e:
             raise HTTPException(status_code=400, detail=str(e))
     return results
+############################################################################################################
+@router.delete(
+        truncate,
+        summary="Truncate table",
+        description="Truncate table",
+        tags=["Truncate"],
+        )
+async def truncate_table(db: AsyncSession = Depends(get_session)):
+    my_repository = bankdownloadRepository(db)
+    my_service = bankdownloadService(my_repository)
+       
+    try:
+        deleted = await my_service.truncate_records(myModel)
+    except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    return deleted
 ############################################################################################################

@@ -14,6 +14,7 @@ get_all=post_all="/rules"
 search="/rules/search"
 send_rule_report="/rules/email"
 del_all = "/rulesdel"
+truncate="/rulestruncate"
 myObjects="rules"
 get_response_model=rulesListDTO
 get_pkey_model = ruleDTO
@@ -139,3 +140,20 @@ async def delete_record(input_data: del_response_model, db: AsyncSession = Depen
             raise HTTPException(status_code=400, detail=str(e))
     return results
 ############################################################################################################
+@router.delete(
+        truncate,
+        summary="Truncate table",
+        description="Truncate table",
+        tags=["Truncate"],
+        )
+async def truncate_table(db: AsyncSession = Depends(get_session)):
+    my_repository = ruleRepository(db)
+    my_service = ruleService(my_repository)
+       
+    try:
+        deleted = await my_service.truncate_records(myModel)
+    except Exception as e:
+            raise HTTPException(status_code=400, detail=str(e))
+    return deleted
+############################################################################################################
+
