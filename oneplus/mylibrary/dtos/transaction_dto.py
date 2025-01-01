@@ -76,6 +76,22 @@ class transactionQueryPrimaryKey(BaseModel):
 class transactionQueryUpdateFlag(BaseModel):
     update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
 
+TRANSACTIONS_COLUMNS_FINAL = {
+    'bank_account_key': 'bank_account_key',
+    'tdate': 'tdate',
+    'description': 'description',
+    'amount': 'amount',
+    'classification': 'classification',
+    'period_status': 'period_status',
+    'transaction_group': 'transaction_group',
+    'transaction_type': 'transaction_type',
+    'vendor': 'vendor',
+    'customer': 'customer',
+    'comments': 'comments',
+    'vendor_no_w9': 'vendor_no_w9',
+    'customer_no_w9': 'customer_no_w9'
+}
+
 TRANSACTIONS_COLUMNS = {
     'bank_account_key': 'bank_account_key',
     'tdate': 'tdate',
@@ -107,5 +123,4 @@ TRANSACTIONS_COLUMNS = {
     'Year' : 'not_required15',
     'Month' : 'not_required16'
 }
-
  

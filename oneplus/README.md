@@ -17,12 +17,20 @@ Alembic Initial Setup
 5. Run `alembic revision --autogenerate -m "Create new database oneplusrealtydb"`
 6. Alembic Revision ID: 112c2833dc69
 
-PostgresSQL initial setup using terminal
+Docker compose up
 
-1. In terminal, type `psql postgres`
-2. Now run `CREATE DATABASE oneplusrealtydb OWNER admin;`
-3. Now run "GRANT ALL PRIVILEGES ON DATABASE oneplusrealtydb TO admin;"
-4. Run "\q" to exit
+1. Command space 'Terminal'
+2. cd documents/install/database/postgres
+3. Make sure postgres.yaml file exists
+4. Run docker compose up -d
+
+Postgres using Azure Data Studio
+
+1. Open Azure Studio.
+2. Connection Type = PostgreSQL. Server Name = localhost.
+3. Authentication type = Password. User name = postgres Pwd = postgres. Advanced: Port = 5432
+4. Now run `CREATE DATABASE oneplusrealtydb OWNER postgres;`
+5. Now run "GRANT ALL PRIVILEGES ON DATABASE oneplusrealtydb TO postgres;"
 
 PostgreSQL Database using pgAdmin:
 Port: The default PostgreSQL port is 5432. Use this unless you've changed it during the PostgreSQL installation or configuration.

@@ -2,7 +2,7 @@ from fastapi import APIRouter, File, HTTPException, Depends, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..dtos.transaction_dto import transactionQueryPrimaryKey,transactionQueryUpdateFlag, transactionSearchQuery
 from ..dtos.service_dto import QueryEmail
-from ..dtos.transaction_dto import transactionsListDTO, transactionsDelListDTO, transactionDTO,TRANSACTIONS_COLUMNS
+from ..dtos.transaction_dto import transactionsListDTO, transactionsDelListDTO, transactionDTO,TRANSACTIONS_COLUMNS_FINAL
 from ..database.db import get_session
 from ..repositories.transaction_repository import transactionRepository
 from ..services.transaction_service import transactionService
@@ -175,7 +175,7 @@ async def upload_and_upsert_records(
     my_service = transactionService(my_repository)
 
     my_filehandler = transactionFileHandler(file)
-    input_data, errorsList = my_filehandler.extract_data_from_file(column_names = TRANSACTIONS_COLUMNS)
+    input_data, errorsList = my_filehandler.extract_data_from_file(column_names = TRANSACTIONS_COLUMNS_FINAL)
     
     if errorsList:
         return errorsList

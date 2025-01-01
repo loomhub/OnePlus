@@ -127,7 +127,7 @@ async def upload_and_upsert_records(
     query_params: bankaccountQueryUpdateFlag = Depends(),
     db: AsyncSession = Depends(get_session)
                                    ):
-    
+
     my_repository = bankaccountRepository(db)
     my_service = bankaccountService(my_repository)
 

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint,ForeignKey
+from sqlalchemy import Column, Integer, String, Date, Numeric,CheckConstraint, UniqueConstraint,ForeignKey,Text
 from ..database.db import Base
 
 class transactionstmpModel(Base):
@@ -7,7 +7,7 @@ class transactionstmpModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     bank_account_key = Column(String,nullable=False,index=True)
     tdate = Column(Date,nullable=False,index=True)
-    description = Column(String,nullable=False, index=True)
+    description = Column(Text,nullable=False, index=True)
     amount = Column(Numeric(10, 2),nullable=False,index=True)
     classification = Column(String)
     period_status = Column(String)

@@ -63,9 +63,15 @@ class myFileHandler:
         return dto_list
 #############################################################################################################
     def parse_date(self,date_str):
-        if len(date_str.split('/')[-1]) == 4:  # Check if the year part has four digits
+        # Convert to string and handle NaN values
+        date_str = str(date_str) if pd.notna(date_str) else ''
+    
+        # Try parsing with different formats
+        if len(date_str.split('/')[-1]) == 4:  # Check for MM/DD/YYYY
             return pd.to_datetime(date_str, format='%m/%d/%Y', errors='coerce')
-        else:
+        elif len(date_str.split('-')[0]) == 4:  # Check for YYYY-MM-DD
+            return pd.to_datetime(date_str, format='%Y-%m-%d', errors='coerce')
+        else:  # Check for MM/DD/YY
             return pd.to_datetime(date_str, format='%m/%d/%y', errors='coerce')
 #############################################################################################################
     def convert_columns_to_date(self, 
@@ -79,6 +85,7 @@ class myFileHandler:
                 try:
                     df[column_name] = df[column_name].fillna(pd.Timestamp(null_value_date))
                     df[column_name] = df[column_name].apply(self.parse_date).dt.date
+                    print(df[column_name])
                 except Exception as e:
                     print(f"Error converting {column_name}: {e}")
             else:
