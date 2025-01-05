@@ -9,7 +9,7 @@ class birdDTO(BaseModel):
     server : Optional[str] = None
     port : Optional[int] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class birdDelDTO(BaseModel):
     sender : Optional[str] = None
@@ -24,4 +24,4 @@ class birdQueryPrimaryKey(BaseModel):
     sender: str = Field(None, description="Name of the bird to filter by")
 
 class birdQueryUpdateFlag(BaseModel):
-    update: Optional[str] = Field(None, description="Set X to update the record even if it exists") 
+    update: Optional[str] = Field(None, description="Set X to update the record even if it exists")

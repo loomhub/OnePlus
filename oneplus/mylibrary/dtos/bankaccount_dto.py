@@ -10,7 +10,7 @@ class bankaccountDTO(BaseModel):
     llc : Optional[str] = None
     property_name : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
     
 class bankaccountFullDTO(BaseModel):
@@ -22,7 +22,7 @@ class bankaccountFullDTO(BaseModel):
     llc : Optional[str] = None
     property_name : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class bankaccountsListDTO(BaseModel):
     bankaccounts: List[bankaccountDTO]
@@ -53,4 +53,4 @@ BANK_ACCOUNTS_COLUMNS = {
     'ExternalAccount': 'account_number',
     'LLC': 'llc',
     'Property': 'property_name'
-}    
+}

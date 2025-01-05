@@ -15,7 +15,7 @@ class partnerDTO(BaseModel):
     zip_code : Optional[str] = None
     country : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class partnerFullDTO(BaseModel):
     id : Optional[int] = None
@@ -31,7 +31,7 @@ class partnerFullDTO(BaseModel):
     zip_code : Optional[str] = None
     country : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class partnersListDTO(BaseModel):
     partners: List[partnerDTO]

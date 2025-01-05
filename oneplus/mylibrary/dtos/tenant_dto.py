@@ -11,7 +11,7 @@ class tenantDTO(BaseModel):
     rent : Optional[float] = None
     security_deposit : Optional[float] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class tenantFullDTO(BaseModel):
     id : Optional[int] = None
@@ -23,7 +23,7 @@ class tenantFullDTO(BaseModel):
     rent : Optional[float] = None
     security_deposit : Optional[float] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class tenantsListDTO(BaseModel):
     tenants: List[tenantDTO]
@@ -67,4 +67,4 @@ TENANTS_COLUMNS = {
     'Lease End': 'lease_end',
     'Rent': 'rent',
     'Security Deposit': 'security_deposit'
-}    
+}

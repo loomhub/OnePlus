@@ -7,7 +7,7 @@ class transactionTypeDTO(BaseModel):
     transaction_type : Optional[str] = None
     transaction_description : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class transactionTypeFullDTO(BaseModel):
     id : Optional[int] = None
@@ -15,7 +15,7 @@ class transactionTypeFullDTO(BaseModel):
     transaction_type : Optional[str] = None
     transaction_description : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class transactionTypesListDTO(BaseModel):
     transactionTypes: List[transactionTypeDTO]
@@ -46,4 +46,4 @@ TRANSACTION_TYPES_COLUMNS = {
     'Transaction Group': 'transaction_group',
     'Transaction Type': 'transaction_type',
     'Description': 'transaction_description'
-}    
+}

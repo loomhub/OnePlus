@@ -8,7 +8,7 @@ class transreportDTO(BaseModel):
     calc_method : Optional[str] = None
     fields : Optional[str] = None
     class Config:
-        orm_mode = True  
+        from_attributes = True  
 
 class transreportsListDTO(BaseModel):
     transreports: List[transreportDTO]
@@ -20,7 +20,7 @@ class transreportFullDTO(BaseModel):
     calc_method : Optional[str] = None
     fields : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class transreportsFullListDTO(BaseModel):
     transreports: List[transreportFullDTO]
@@ -38,7 +38,7 @@ class reportDTO(BaseModel):
     month: Optional[str] = None
     amount: Optional[float] = None
     class Config:
-        orm_mode = True  
+        from_attributes = True  
 
 class reportListDTO(BaseModel):
     performance: List[reportDTO]
@@ -64,4 +64,4 @@ TRANSREPORT_COLUMNS = {
     'category': 'category',
     'calc_method': 'calc_method',
     'fields': 'fields'
-}    
+}

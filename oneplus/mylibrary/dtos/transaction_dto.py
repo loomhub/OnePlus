@@ -17,7 +17,7 @@ class transactionDTO(BaseModel):
     vendor_no_w9 : Optional[str] = None
     customer_no_w9 : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class transactionsListDTO(BaseModel):
     transactions: List[transactionDTO]
@@ -38,7 +38,7 @@ class transactionFullDTO(BaseModel):
     vendor_no_w9 : Optional[str] = None
     customer_no_w9 : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class transactionsFullListDTO(BaseModel):
     transactions: List[transactionFullDTO]
@@ -123,4 +123,3 @@ TRANSACTIONS_COLUMNS = {
     'Year' : 'not_required15',
     'Month' : 'not_required16'
 }
- 

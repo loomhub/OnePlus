@@ -6,14 +6,14 @@ class sampleDTO(BaseModel):
     llc : Optional[str] = None
     ein : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class sampleFullDTO(BaseModel):
     id : Optional[int] = None
     llc : Optional[str] = None
     ein : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class samplesListDTO(BaseModel):
     samples: List[sampleDTO]
@@ -43,4 +43,4 @@ SAMPLE_COLUMNS = {
     'Address': 'llc_address',
     'Description': 'llc_description',
     'FormationDate': 'formation_date'
-}    
+}

@@ -8,7 +8,7 @@ class bankdownloadDTO(BaseModel):
     description : Optional[str] = None
     amount : Optional[float] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class bankdownloadFullDTO(BaseModel):
     id : Optional[int] = None
@@ -17,7 +17,7 @@ class bankdownloadFullDTO(BaseModel):
     description : Optional[str] = None
     amount : Optional[float] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class bankdownloadsListDTO(BaseModel):
     bankdownloads: List[bankdownloadDTO]
@@ -66,4 +66,4 @@ WELLSFARGO_COLUMNS = {
     'not_required1': 'not_required1',
     'not_required2': 'not_required2',
     'description': 'description'  
-}    
+}

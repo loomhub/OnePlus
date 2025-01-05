@@ -10,7 +10,7 @@ class emailConfigDTO(BaseModel):
     bcc : Optional[str] = None
     active : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class emailConfigFullDTO(BaseModel):
     id : Optional[int] = None
@@ -21,7 +21,7 @@ class emailConfigFullDTO(BaseModel):
     bcc : Optional[str] = None
     active : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class emailsConfigFullListDTO(BaseModel):
     emailsConfig: List[emailConfigFullDTO]
@@ -52,4 +52,4 @@ EMAIL_CONFIG_COLUMNS = {
     'CC': 'cc',
     'BCC': 'bcc',
     'Active': 'active'  
-}    
+}

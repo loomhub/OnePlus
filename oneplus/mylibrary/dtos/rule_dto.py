@@ -12,7 +12,7 @@ class ruleDTO(BaseModel):
     vendor_no_w9 : Optional[str] = None
     customer_no_w9 : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
     
 class ruleFullDTO(BaseModel):
     id : Optional[int] = None
@@ -25,7 +25,7 @@ class ruleFullDTO(BaseModel):
     vendor_no_w9 : Optional[str] = None
     customer_no_w9 : Optional[str] = None
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class rulesListDTO(BaseModel):
     rules: List[ruleDTO]
@@ -57,4 +57,3 @@ RULES_COLUMNS = {
     'vendor_no_w9': 'vendor_no_w9',
     'customer_no_w9': 'customer_no_w9'
  }
-    
